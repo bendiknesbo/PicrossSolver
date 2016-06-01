@@ -52,7 +52,7 @@ namespace DomainTests {
                 } catch (Exception ex) {
                     errorLevels.Add(levelName);
                     sb.AppendLine();
-                    sb.AppendLine(string.Format("Failed during setup: **{0}**", step));
+                    sb.AppendLine(string.Format("Failed during step: **{0}**", step));
                     sb.AppendLine(string.Format("Failed during level: **{0}**", levelName));
                     if (step == Step.Assert) {
                         var solvedOnce = (int[,]) _solver.WorkingGrid.Clone();
@@ -116,7 +116,7 @@ Number of failing levels with two Solve(): {1}
 
         [TestMethod]
         public void SelectiveTest() {
-            _levels = LevelFactory.EasyGallery1().Where(kvp => kvp.Key.Contains("Column 1, Row 1")).ToDictionary(k => k.Key, v => v.Value);
+            _levels = LevelFactory.EasyGallery1().Where(kvp => kvp.Key.Contains("Column 0, Row 2")).ToDictionary(k => k.Key, v => v.Value);
             Run();
         }
 

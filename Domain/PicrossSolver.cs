@@ -26,6 +26,7 @@ namespace Domain {
         private int _iterationCounter;
         private string _readableString;
         private Dictionary<int, Classifier> _oppositeItems;
+        private const int OutOfBoundsConst = -1;
 
         public PicrossSolver(int rowCount, int colCount, Dictionary<int, Classifier> rows, Dictionary<int, Classifier> columns) {
             _colCount = colCount;
@@ -92,44 +93,87 @@ namespace Domain {
                     if (colorClassifier.Count == _selectionCount) {
                         FillSelection(itemNumber, myColor);
                         colorClassifier.IsDone = true;
-                        continue;
+                        //continue;
                     }
                     var others = itemClassifier.Colors.Values.Where(cc => cc.MyColor != colorClassifier.MyColor);
                     if (others.All(cc => cc.IsDone)) {
                         FillSelection(itemNumber, myColor);
                         colorClassifier.IsDone = true;
-                        continue;
+                        //continue;
                     }
                     if (colorClassifier.IsConnected) {
                         int[] workingArray = _getArray(itemNumber);
                         var firstIndex = IndexOf(workingArray, myColor);
                         var lastIndex = LastIndexOf(workingArray, myColor);
-                        if (firstIndex == -1 || lastIndex == -1 || firstIndex > lastIndex) {
+                        if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
                             //do nothing
                         } else if (firstIndex == 0) {
+                            //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
                             FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: colorClassifier.Count);
                             colorClassifier.IsDone = true;
-                            continue;
+                            //continue;
                         } else if (lastIndex == _selectionCount) {
+                            //Eksempel: 0,0,0,0,2 + Count=3 -> 0,0,2,2,2
                             FillSelection(itemNumber, myColor, startIndex: lastIndex - colorClassifier.Count, endIndex: lastIndex);
                             colorClassifier.IsDone = true;
-                            continue;
+                            //continue;
                         } else {
+                            if (0 + colorClassifier.Count > firstIndex) {
+                                //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
+                                FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: 0 + colorClassifier.Count);
+                            }
+                            if (_selectionCount - colorClassifier.Count < lastIndex) {
+                                //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
+                                FillSelection(itemNumber, myColor, startIndex: _selectionCount - colorClassifier.Count, endIndex: lastIndex);
+                            }
+                            //Eksempel: 0,2,0,2,0 + Count=4 -> 0,2,2,2,0
                             FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: lastIndex);
-                            continue;
+                            //continue?
                         }
                     }
                     var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary(k => k.Key, v => v.Value);
                     if (possibleSpots.Count == colorClassifier.Count) {
                         FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
-                        continue;
+                        //continue;
+                    } else {
+                        //fleire mulige enn antall som skal til.
+                        if (colorClassifier.IsConnected) {
+                            int[] workingArray = _getArray(itemNumber);
+                            var firstIndex = IndexOf(workingArray, myColor);
+                            var lastIndex = LastIndexOf(workingArray, myColor);
+                            if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
+                                //do nothing
+                            } else if (firstIndex - 1 <= OutOfBoundsConst) {
+                                //
+                            } else if (lastIndex + 1 >= _items.Count) {
+                                //
+                            } else {
+                                var cellBefore = _getCell(itemNumber, firstIndex - 1);
+                                if (cellBefore == 0) {
+                                    //hmm...
+                                } else if (cellBefore == (int) myColor) {
+                                    Console.WriteLine("Wat??? breakpoint her...");
+                                } else {
+                                    FillSelection(itemNumber, myColor, firstIndex, firstIndex + colorClassifier.Count);
+                                }
+                                /*
+                                //ved å ha denne koden med, så passer ikkje testene?? wat? dette må eg sjekke ut av...
+                                var cellAfter = _getCell(itemNumber, lastIndex + 1);
+                                if (cellAfter == 0) {
+                                    //hmm...
+                                } else if (cellAfter == (int) myColor) {
+                                    Console.WriteLine("Wat??? breakpoint her...");
+                                } else {
+                                    FillSelection(itemNumber, myColor, lastIndex - colorClassifier.Count, lastIndex);
+                                }
+                                //*/
+                            }
+                        } else {
+                            //todo...
+                        }
                     }
                 }
             }
-        }
-
-        private struct Temp {
-            public object RowOrColIdx;
         }
 
         private int IndexOf(int[] arr, Color color) {
@@ -137,7 +181,7 @@ namespace Domain {
                 if (arr[i] == (int) color)
                     return i;
             }
-            return -1;
+            return OutOfBoundsConst;
         }
 
         private int LastIndexOf(int[] arr, Color color) {
@@ -145,7 +189,7 @@ namespace Domain {
                 if (arr[i] == (int) color)
                     return i;
             }
-            return -1;
+            return OutOfBoundsConst;
         }
 
         private int FindNumberOfElementsInSelection(int index, Color color) {
