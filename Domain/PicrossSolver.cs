@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Domain {
@@ -7,17 +8,17 @@ namespace Domain {
         public Dictionary<int, Classifier> Rows { get; private set; }
         public Dictionary<int, Classifier> Columns { get; private set; }
 
-        public int[,] WorkingGrid;
+        public Color[,] WorkingGrid;
         private readonly int _rowCount;
         private readonly int _colCount;
         private readonly int _cellCount;
         private int _paintedCount;
         private bool _isDirty;
-        private Func<int, int[]> _getArray;
+        private Func<int, Color[]> _getArray;
         private int _selectionCount;
         private Dictionary<int, Classifier> _items;
         private Selection _selection;
-        private Func<int, int, int> _getCell;
+        private Func<int, int, Color> _getCell;
         private int _iterationCounter;
         private string _readableString;
         private Dictionary<int, Classifier> _oppositeItems;
@@ -29,7 +30,7 @@ namespace Domain {
             _cellCount = _rowCount * _colCount;
             Columns = columns;
             Rows = rows;
-            WorkingGrid = new int[rowCount, colCount];
+            WorkingGrid = new Color[rowCount, colCount];
         }
 
         public void Solve() {
@@ -41,13 +42,6 @@ namespace Domain {
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
                 if (_cellCount == _paintedCount) break;
-
-#if DEBUG
-                _readableString = WorkingGrid.ToReadableString();
-                if (_iterationCounter > 40) Console.WriteLine();
-#else
-                if (_iterationCounter > 40) break;
-#endif
             } while (_isDirty || _iterationCounter <= 40);
         }
 
@@ -76,9 +70,6 @@ namespace Domain {
                 var itemClassifier = item.Value;
 
                 foreach (var colorClassKvp in itemClassifier.Colors) {
-#if DEBUG
-                    _readableString = WorkingGrid.ToReadableString();
-#endif
                     var myColor = colorClassKvp.Key;
                     var colorClassifier = colorClassKvp.Value;
 
@@ -97,7 +88,7 @@ namespace Domain {
                         //continue;
                     }
                     if (colorClassifier.IsConnected) {
-                        int[] workingArray = _getArray(itemNumber);
+                        Color[] workingArray = _getArray(itemNumber);
                         var firstIndex = IndexOf(workingArray, myColor);
                         var lastIndex = LastIndexOf(workingArray, myColor);
                         if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
@@ -126,6 +117,18 @@ namespace Domain {
                             //continue?
                         }
                     }
+                    if (!colorClassifier.IsConnected) {
+                        //todo: kan eg få til denne men med ferdig utfylte plasser?
+                        var count = itemClassifier.Colors.Count(cc => cc.Value.Count > 0);
+                        if (count == 2) {
+                            var other = itemClassifier.Colors.First(cc => !cc.Key.Equals(myColor));
+                            if (other.Value.IsConnected) {
+                                FillCells(itemNumber, myColor, new List<int> { 0, _selectionCount - 1 });
+                                //continue;
+                            }
+                        }
+                    }
+
                     var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary(k => k.Key, v => v.Value);
                     if (possibleSpots.Count == colorClassifier.Count) {
                         FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
@@ -133,7 +136,7 @@ namespace Domain {
                     } else {
                         //fleire mulige enn antall som skal til.
                         if (colorClassifier.IsConnected) {
-                            int[] workingArray = _getArray(itemNumber);
+                            Color[] workingArray = _getArray(itemNumber);
                             var firstIndex = IndexOf(workingArray, myColor);
                             var lastIndex = LastIndexOf(workingArray, myColor);
                             if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
@@ -145,20 +148,35 @@ namespace Domain {
                             } else {
                                 var cellBefore = _getCell(itemNumber, firstIndex - 1);
                                 var cellAfter = _getCell(itemNumber, lastIndex + 1); //må cache dette resultatet, da den neste FillSelection kan endre den!
-                                if (cellBefore == 0) {
+                                if (cellBefore.Equals(Color.Empty)) {
                                     //hmm...
-                                } else if (cellBefore == (int) myColor) {
+                                } else if (cellBefore == myColor) {
                                     Console.WriteLine("Wat??? breakpoint her...");
                                 } else {
                                     FillSelection(itemNumber, myColor, firstIndex, firstIndex + colorClassifier.Count);
                                 }
-                                
-                                if (cellAfter == 0) {
+
+                                if (cellAfter.Equals(Color.Empty)) {
                                     //hmm...
-                                } else if (cellAfter == (int) myColor) {
+                                } else if (cellAfter == myColor) {
                                     Console.WriteLine("Wat??? breakpoint her...");
                                 } else {
                                     FillSelection(itemNumber, myColor, lastIndex - colorClassifier.Count + 1, lastIndex);
+                                }
+                            }
+                        } else if (!colorClassifier.IsConnected && colorClassifier.Count == 2) {
+                            //todo: Meir generell??
+                            Color[] workingArray = _getArray(itemNumber);
+                            var firstIndex = IndexOf(workingArray, myColor);
+                            if (firstIndex <= OutOfBoundsConst) {
+                                //do nothing
+                            } else {
+                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Key >= firstIndex - 1 && kvp.Key <= firstIndex + 1)).ToDictionary(k => k.Key, v => v.Value);
+                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && cc.Value.IsDone != true)).ToDictionary(k => k.Key, v => v.Value);
+                                if (newPossibleSpots.Count == colorClassifier.Count - 1) {
+                                    FillCells(itemNumber, myColor, newPossibleSpots.Keys.ToList());
+                                    colorClassifier.IsDone = true;
+                                    //continue
                                 }
                             }
                         } else {
@@ -169,17 +187,17 @@ namespace Domain {
             }
         }
 
-        private int IndexOf(int[] arr, Color color) {
+        private int IndexOf(Color[] arr, Color color) {
             for (int i = 0; i < arr.Length; i++) {
-                if (arr[i] == (int) color)
+                if (arr[i] == color)
                     return i;
             }
             return OutOfBoundsConst;
         }
 
-        private int LastIndexOf(int[] arr, Color color) {
+        private int LastIndexOf(Color[] arr, Color color) {
             for (int i = arr.Length - 1; i >= 0; i--) {
-                if (arr[i] == (int) color)
+                if (arr[i] == color)
                     return i;
             }
             return OutOfBoundsConst;
@@ -189,7 +207,7 @@ namespace Domain {
             int count = 0;
             var actualRow = _getArray(index);
             for (int i = 0; i < actualRow.Length; i++) {
-                if (_getCell(index, i) == (int) color)
+                if (_getCell(index, i) == color)
                     count++;
             }
             return count;
@@ -239,10 +257,13 @@ namespace Domain {
         }
 
         private void FillCellAndSetDirty(int row, int column, Color color) {
-            if (WorkingGrid[row, column] == 0) {
-                WorkingGrid[row, column] = (int) color;
+            if (WorkingGrid[row, column].Equals(Color.Empty)) {
+                WorkingGrid[row, column] = color;
                 _paintedCount++;
                 _isDirty = true;
+#if DEBUG
+                _readableString = WorkingGrid.ToReadableString();
+#endif
             }
         }
     }

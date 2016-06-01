@@ -1,3 +1,5 @@
+using System.Drawing;
+
 namespace Domain {
     public class ColorClassifier {
         public Color MyColor { get; set; }

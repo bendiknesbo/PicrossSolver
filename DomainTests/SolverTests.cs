@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -29,21 +30,25 @@ namespace DomainTests {
         [TestInitialize]
         public void TestInit() { }
 
-        private void Setup() {
+        private void Setup(bool fromFile = false) {
             _grid = new PicrossGrid();
-            _grid.InitFromGridString(_gridString);
+            if (fromFile)
+                _grid.InitFromImg(_gridString);
+            else
+                _grid.InitFromGridString(_gridString);
             _solver = new PicrossSolver(_grid.RowCount, _grid.ColumnCount, _grid.Rows, _grid.Columns);
         }
 
-        private void Run() {
+        private void Run(bool fromFile = false) {
             var sb = new StringBuilder();
             var errorLevels = new List<string>();
             foreach (var level in _levels) {
+                GridHelpers.ResetCache();
                 var levelName = level.Key;
                 _gridString = level.Value;
                 Step step = Step.Setup;
                 try {
-                    Setup();
+                    Setup(fromFile: fromFile);
                     step = Step.Solve;
                     _solver.Solve();
                     step = Step.Assert;
@@ -54,9 +59,9 @@ namespace DomainTests {
                     sb.AppendLine(string.Format("Failed during step: **{0}**", step));
                     sb.AppendLine(string.Format("Failed during level: **{0}**", levelName));
                     if (step == Step.Assert) {
-                        var solvedOnce = (int[,]) _solver.WorkingGrid.Clone();
+                        var solvedOnce = (Color[,]) _solver.WorkingGrid.Clone();
                         _solver.Solve();
-                        var solvedTwice = (int[,]) _solver.WorkingGrid.Clone();
+                        var solvedTwice = (Color[,]) _solver.WorkingGrid.Clone();
                         var expected = string.Format("Expected:{0}{1}", Environment.NewLine, _grid.AnswerGrid.ToReadableString());
                         var actual1 = string.Format("Actual:   {0}{1}", Environment.NewLine, solvedOnce.ToReadableString());
                         var actual2 = string.Format("Actual 2: {0}{1}", Environment.NewLine, solvedTwice.ToReadableString());
@@ -91,16 +96,7 @@ Number of failing levels: {0}
         [TestMethod]
         public void Easy_Gallery1_FromImg() {
             _levels = LevelFactory.EasyGallery1_FromImg();
-            Run();
-        }
-
-        [TestMethod]
-        public void GetRowCountFromImg() {
-            var filePath = @"LevelImages\SizeTest.png";
-            var rows = GridHelpers.GetRowCountFromImg(filePath);
-            Assert.AreEqual(5, rows);
-            var cols = GridHelpers.GetColumnCountFromImg(filePath);
-            Assert.AreEqual(3, cols);
+            Run(fromFile: true);
         }
 
         [TestMethod]
@@ -109,7 +105,7 @@ Number of failing levels: {0}
             Run();
         }
         [TestMethod]
-        public void Medium_Gallery3() {
+        public void Medium_Gallery1() {
             _levels = LevelFactory.MediumGallery1();
             Run();
         }
@@ -131,10 +127,10 @@ Number of failing levels: {0}
 2,2,2,1,1
 ";
             Setup();
-            Assert.AreEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => i != 0));
+            Assert.AreEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => !i.Equals(Color.Empty)));
             _solver.Solve();
             Console.WriteLine(_solver.WorkingGrid.ToReadableString());
-            Assert.AreNotEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => i != 0));
+            Assert.AreNotEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => !i.Equals(Color.Empty)));
             AssertMatrix();
         }
 
@@ -183,14 +179,11 @@ Number of failing levels: {0}
             AssertMatrix();
         }
 
-        public int GetNumberOfElements(int[,] grid, Func<int, bool> evaluator) {
+        public int GetNumberOfElements(Color[,] grid, Func<Color, bool> evaluator) {
             int count = 0;
-            for (int i = 0; i < grid.GetLength(0); i++) {
-                var row = grid.GetRow(i);
-                for (int j = 0; j < row.Length; j++) {
-                    if (evaluator(grid[i, j]))
-                        count++;
-                }
+            foreach (var cell in grid) {
+                if (evaluator(cell))
+                    count++;
             }
             return count;
         }
@@ -205,12 +198,12 @@ Number of failing levels: {0}
             }
         }
 
-        public bool AreEqualMatrices(int[,] expected, int[,] actual) {
+        public bool AreEqualMatrices(Color[,] expected, Color[,] actual) {
             if (expected.GetLength(0) != actual.GetLength(0)) return false;
             if (expected.GetLength(1) != actual.GetLength(1)) return false;
             for (int i = 0; i < _grid.RowCount; i++) {
                 for (int j = 0; j < _grid.ColumnCount; j++) {
-                    if (expected[i, j] != actual[i, j])
+                    if (!(expected[i, j].Equals(actual[i, j])))
                         return false;
                 }
             }

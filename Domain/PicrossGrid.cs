@@ -1,23 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Domain {
     public class PicrossGrid {
-        public int ColumnCount { get; private set; }
-        public int RowCount { get; private set; }
+        public int ColumnCount;
+        public int RowCount;
         public List<Color> UsedColors;
 
-        public int[,] AnswerGrid;
+        public Color[,] AnswerGrid;
         public Dictionary<int, Classifier> Rows = new Dictionary<int, Classifier>();
         public Dictionary<int, Classifier> Columns = new Dictionary<int, Classifier>();
 
 
         public void InitFromGridString(string gridString) {
-            RowCount = GridHelpers.GetRowCountFromGridString(gridString);
-            ColumnCount = GridHelpers.GetColumnCountFromGridString(gridString);
-            UsedColors = GridHelpers.GetUsedColorsFromGridString(gridString);
-            AnswerGrid = GridHelpers.InitFromGridString(gridString, rowCount: RowCount, colCount: ColumnCount);
+            AnswerGrid = GridHelpers.InitFromGridString2(gridString, rowCount: out RowCount, colCount: out ColumnCount);
+            UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
+            GenerateRowClassifiers();
+            GenerateColumnClassifiers();
+        }
+
+        public void InitFromImg(string filePath) {
+            AnswerGrid = GridHelpers.InitFromImg(filePath, rowCount: out RowCount, colCount: out ColumnCount);
+            UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
             GenerateRowClassifiers();
             GenerateColumnClassifiers();
         }

@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 
 namespace Domain {
     public class Classifier {
         public Dictionary<Color, ColorClassifier> Colors = new Dictionary<Color, ColorClassifier>();
 
-        public Classifier(List<Color> usedColors, int[] row) {
+        public Classifier(List<Color> usedColors, Color[] row) {
             var colorRow = new Color[row.Length];
             for (int i = 0; i < row.Length; i++) {
-                colorRow[i] = (Color) row[i];
+                colorRow[i] = row[i];
             }
             foreach (Color color in usedColors) {
                 var count = colorRow.Count(c => c == color);
