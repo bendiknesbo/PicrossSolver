@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 
 namespace Domain {
@@ -8,7 +9,7 @@ namespace Domain {
         public int RowCount { get; private set; }
         public List<Color> UsedColors;
 
-        public int[,] AnswerGrid;
+        public Color[,] AnswerGrid;
         public Dictionary<int, Classifier> Rows = new Dictionary<int, Classifier>();
         public Dictionary<int, Classifier> Columns = new Dictionary<int, Classifier>();
 
@@ -18,6 +19,15 @@ namespace Domain {
             ColumnCount = GridHelpers.GetColumnCountFromGridString(gridString);
             UsedColors = GridHelpers.GetUsedColorsFromGridString(gridString);
             AnswerGrid = GridHelpers.InitFromGridString(gridString, rowCount: RowCount, colCount: ColumnCount);
+            GenerateRowClassifiers();
+            GenerateColumnClassifiers();
+        }
+
+        public void InitFromImg(string filePath) {
+            RowCount = GridHelpers.GetRowCountFromImg(filePath);
+            ColumnCount = GridHelpers.GetColumnCountFromImg(filePath);
+            UsedColors = GridHelpers.GetUsedColorsFromImg(filePath);
+            AnswerGrid = GridHelpers.InitFromImg(filePath);
             GenerateRowClassifiers();
             GenerateColumnClassifiers();
         }

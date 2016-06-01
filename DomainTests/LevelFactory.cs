@@ -64,10 +64,7 @@ namespace DomainTests {
                 if (string.IsNullOrWhiteSpace(row.Value))
                     continue;
                 var newValue = row.Value;
-                if (fromFile) {
-                    //newValue = GridHelpers.InitFromImg(newValue);
-                }
-                if (newValue.Contains("0"))
+                if (!fromFile && newValue.Contains("0"))
                     throw new InvalidOperationException(string.Format("Picross solution can not contain zeroes! Level: {0}", prefix + " " + row.Key));
                 newDict.Add(prefix + " " + row.Key, newValue);
 

@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Color = Domain.Color;
+//using Color = Domain.Color;
 
 namespace DomainTests {
     [TestClass]
@@ -20,10 +21,10 @@ namespace DomainTests {
             Console.WriteLine(grid);
             Assert.AreEqual(5, grid.Rows.Count);
             Assert.AreEqual(5, grid.Columns.Count);
-            Assert.AreEqual(2, grid.Rows[2].Colors[Color.Red].Count);
-            Assert.IsTrue(grid.Rows[2].Colors[Color.Red].IsConnected);
-            Assert.AreEqual(3, grid.Rows[2].Colors[Color.Blue].Count);
-            Assert.IsTrue(grid.Rows[2].Colors[Color.Blue].IsConnected);
+            Assert.AreEqual(2, grid.Rows[2].Colors[Color.FromArgb(1)].Count);
+            Assert.IsTrue(grid.Rows[2].Colors[Color.FromArgb(1)].IsConnected);
+            Assert.AreEqual(3, grid.Rows[2].Colors[Color.FromArgb(2)].Count);
+            Assert.IsTrue(grid.Rows[2].Colors[Color.FromArgb(2)].IsConnected);
         }
 
         [TestMethod]
@@ -36,10 +37,10 @@ namespace DomainTests {
             Console.WriteLine(grid);
             Assert.AreEqual(1, grid.Rows.Count);
             Assert.AreEqual(5, grid.Columns.Count);
-            Assert.AreEqual(4, grid.Rows[0].Colors[Color.Red].Count);
-            Assert.IsFalse(grid.Rows[0].Colors[Color.Red].IsConnected);
-            Assert.AreEqual(1, grid.Rows[0].Colors[Color.Blue].Count);
-            Assert.IsTrue(grid.Rows[0].Colors[Color.Blue].IsConnected);
+            Assert.AreEqual(4, grid.Rows[0].Colors[Color.FromArgb(1)].Count);
+            Assert.IsFalse(grid.Rows[0].Colors[Color.FromArgb(1)].IsConnected);
+            Assert.AreEqual(1, grid.Rows[0].Colors[Color.FromArgb(2)].Count);
+            Assert.IsTrue(grid.Rows[0].Colors[Color.FromArgb(2)].IsConnected);
         }
 
         [TestMethod]
