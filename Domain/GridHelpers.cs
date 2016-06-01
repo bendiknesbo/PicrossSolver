@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 
@@ -37,8 +38,6 @@ namespace Domain {
             }
             return set.Distinct().ToList();
         }
-
-
         public static int[,] InitFromGridString(string gridString, int rowCount, int colCount) {
             var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -52,6 +51,28 @@ namespace Domain {
                     columnCounter++;
                 }
                 rowCounter++;
+            }
+            return grid;
+        }
+
+
+        public static int GetRowCountFromImg(string filePath) {
+            var bmp = new Bitmap(filePath);
+            return bmp.Height;
+        }
+
+        public static int GetColumnCountFromImg(string filePath) {
+            var bmp = new Bitmap(filePath);
+            return bmp.Width;
+        }
+
+        public static System.Drawing.Color[,] InitFromImg(string filePath) {
+            var bmp = new Bitmap(filePath);
+            var grid = new System.Drawing.Color[bmp.Height, bmp.Width];
+            for (int row = 0; row < bmp.Height; row++) {
+                for (int col = 0; col < bmp.Width; col++) {
+                    grid[row, col] = bmp.GetPixel(row, col);
+                }
             }
             return grid;
         }

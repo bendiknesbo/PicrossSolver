@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Domain;
 
 namespace DomainTests {
 
@@ -37,6 +38,12 @@ namespace DomainTests {
             }.WithPrefix("Easy Gallery 1:");
         }
 
+        public static Dictionary<string, string> EasyGallery1_FromImg() {
+            return new Dictionary<string, string>{
+                { "Column 0, Row 0", @"LevelImages\EasyGallery1\Col0Row0.png" },
+                }.WithPrefix("Easy Gallery 1:", fromFile: true);
+        }
+
         public static Dictionary<string, string> EasyGallery2() {
             return new Dictionary<string, string>{
                 { "Column 1, Row 2", "1,1,1,1,1,1,1,1,1,1\r\n2,1,1,1,2,1,1,1,1,1\r\n2,2,2,2,2,1,1,2,2,2\r\n2,2,2,2,2,1,1,2,1,2\r\n2,3,2,3,2,1,1,1,1,2\r\n2,2,2,2,2,1,1,1,1,2\r\n1,1,2,2,2,2,2,2,2,2\r\n1,1,2,2,2,2,2,2,2,2\r\n1,1,2,2,2,2,2,2,2,2\r\n1,1,2,2,1,1,1,1,1,2" },
@@ -51,17 +58,22 @@ namespace DomainTests {
     }
 
     public static class DictionaryHelpers {
-        public static Dictionary<string, string> WithPrefix(this Dictionary<string, string> dict, string prefix) {
+        public static Dictionary<string, string> WithPrefix(this Dictionary<string, string> dict, string prefix, bool fromFile = false) {
             var newDict = new Dictionary<string, string>();
             foreach (var row in dict) {
                 if (string.IsNullOrWhiteSpace(row.Value))
                     continue;
-                if (row.Value.Contains("0"))
+                var newValue = row.Value;
+                if (fromFile) {
+                    //newValue = GridHelpers.InitFromImg(newValue);
+                }
+                if (newValue.Contains("0"))
                     throw new InvalidOperationException(string.Format("Picross solution can not contain zeroes! Level: {0}", prefix + " " + row.Key));
-                newDict.Add(prefix + " " + row.Key, row.Value);
+                newDict.Add(prefix + " " + row.Key, newValue);
 
             }
             return newDict;
         }
+
     }
 }

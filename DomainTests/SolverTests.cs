@@ -88,6 +88,20 @@ Number of failing levels: {0}
             _levels = LevelFactory.EasyGallery1();
             Run();
         }
+        [TestMethod]
+        public void Easy_Gallery1_FromImg() {
+            _levels = LevelFactory.EasyGallery1_FromImg();
+            Run();
+        }
+
+        [TestMethod]
+        public void GetRowCountFromImg() {
+            var filePath = @"LevelImages\SizeTest.png";
+            var rows = GridHelpers.GetRowCountFromImg(filePath);
+            Assert.AreEqual(5, rows);
+            var cols = GridHelpers.GetColumnCountFromImg(filePath);
+            Assert.AreEqual(3, cols);
+        }
 
         [TestMethod]
         public void Easy_Gallery2() {
