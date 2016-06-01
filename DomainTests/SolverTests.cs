@@ -91,6 +91,17 @@ Number of failing levels: {0}
         }
 
         [TestMethod]
+        public void Easy_Gallery2() {
+            _levels = LevelFactory.EasyGallery2();
+            Run();
+        }
+        [TestMethod]
+        public void Medium_Gallery3() {
+            _levels = LevelFactory.MediumGallery1();
+            Run();
+        }
+
+        [TestMethod]
         public void SelectiveTest() {
             _levels = LevelFactory.EasyGallery1().Where(kvp => kvp.Key.Contains("Column 0, Row 2")).ToDictionary(k => k.Key, v => v.Value);
             Run();
