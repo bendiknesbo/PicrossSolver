@@ -76,34 +76,10 @@ namespace DomainTests {
                 }
             }
             if (sb.Length != 0) {
-                var secondErrorLevels = new List<string>();
-                foreach (var level in _levels) {
-                    var levelName = level.Key;
-                    _gridString = level.Value;
-                    try {
-                        Setup();
-                        _solver.Solve();
-                        _solver.Solve();
-                        AssertMatrix();
-                    } catch (Exception ex) {
-                        secondErrorLevels.Add(levelName);
-                    }
-                }
-                if (secondErrorLevels.Count != errorLevels.Count) {
-                    sb.AppendLine(HorizontalSplitter);
-                    sb.AppendLine(HorizontalSplitter);
-                    sb.AppendLine(string.Format("WOW! A second Solve() seems to have solved some ({0}) problems!", (errorLevels.Count - secondErrorLevels.Count)));
-                    foreach (var errorLevel in errorLevels.Intersect(secondErrorLevels)) {
-                        sb.AppendLine(string.Format("This level was not solved with a second Solve(): {0}", errorLevel));
-                    }
-                    sb.AppendLine(HorizontalSplitter);
-                    sb.AppendLine(HorizontalSplitter);
-                }
                 sb.Insert(0, string.Format(@"
 Number of failing levels: {0}
-Number of failing levels with two Solve(): {1}
-{2}
-", errorLevels.Count, secondErrorLevels.Count, HorizontalSplitter));
+{1}
+", errorLevels.Count, HorizontalSplitter));
                 Assert.Fail(sb.ToString());
             }
         }

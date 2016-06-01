@@ -145,10 +145,11 @@ namespace Domain {
                                 //do nothing
                             } else if (firstIndex - 1 <= OutOfBoundsConst) {
                                 //
-                            } else if (lastIndex + 1 >= _items.Count) {
-                                //
+                            } else if (lastIndex + 1 > _selectionCount - 1) {
+                                //out of bounds
                             } else {
                                 var cellBefore = _getCell(itemNumber, firstIndex - 1);
+                                var cellAfter = _getCell(itemNumber, lastIndex + 1); //må cache dette resultatet, da den neste FillSelection kan endre den!
                                 if (cellBefore == 0) {
                                     //hmm...
                                 } else if (cellBefore == (int) myColor) {
@@ -156,17 +157,14 @@ namespace Domain {
                                 } else {
                                     FillSelection(itemNumber, myColor, firstIndex, firstIndex + colorClassifier.Count);
                                 }
-                                /*
-                                //ved å ha denne koden med, så passer ikkje testene?? wat? dette må eg sjekke ut av...
-                                var cellAfter = _getCell(itemNumber, lastIndex + 1);
+                                
                                 if (cellAfter == 0) {
                                     //hmm...
                                 } else if (cellAfter == (int) myColor) {
                                     Console.WriteLine("Wat??? breakpoint her...");
                                 } else {
-                                    FillSelection(itemNumber, myColor, lastIndex - colorClassifier.Count, lastIndex);
+                                    FillSelection(itemNumber, myColor, lastIndex - colorClassifier.Count + 1, lastIndex);
                                 }
-                                //*/
                             }
                         } else {
                             //todo...
