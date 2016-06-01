@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.IO;
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Color = Domain.Color;

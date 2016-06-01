@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Domain {
-    public enum Selection {
-        Row = 0,
-        Column = 1,
-    }
-
     public class PicrossSolver {
         public Dictionary<int, Classifier> Rows { get; private set; }
         public Dictionary<int, Classifier> Columns { get; private set; }
@@ -16,7 +11,7 @@ namespace Domain {
         private readonly int _rowCount;
         private readonly int _colCount;
         private readonly int _cellCount;
-        private int _paintedCount = 0;
+        private int _paintedCount;
         private bool _isDirty;
         private Func<int, int[]> _getArray;
         private int _selectionCount;
