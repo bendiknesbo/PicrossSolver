@@ -1,0 +1,52 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace DomainTests {
+
+    public static class LevelFactory {
+        //template:
+        /*
+          { "Column x, Row y", @"" },
+          
+          @"
+0,0,0,0,0
+0,0,0,0,0
+0,0,0,0,0
+0,0,0,0,0
+0,0,0,0,0
+"
+          
+         */
+        public static Dictionary<string, string> EasyGallery1() {
+            return new Dictionary<string, string>{
+                { "Column 0, Row 0", "1,1,1,1,1\r\n1,1,1,1,1\r\n2,2,2,1,1\r\n2,2,2,1,1\r\n2,2,2,1,1" },
+                { "Column 0, Row 1", "3,3,1,3,3\r\n3,1,1,3,3\r\n3,3,1,3,3\r\n3,3,1,3,3\r\n3,1,1,1,3" },
+                { "Column 0, Row 2", "5,4,4,4,4\r\n5,4,5,5,4\r\n5,4,5,5,4\r\n4,4,5,4,4\r\n4,4,5,4,4" },
+                { "Column 0, Row 3", "1,1,1,1,1\r\n1,1,1,1,1\r\n3,3,3,3,3\r\n3,4,3,4,3\r\n3,4,3,3,3" },
+                { "Column 0, Row 4", "2,6,6,2,2\r\n2,6,6,6,2\r\n6,6,6,6,6\r\n5,5,5,5,5\r\n2,2,2,2,2" },
+                { "Column 0, Row 5", "2,2,2,2,2\r\n7,2,7,2,7\r\n7,7,7,7,7\r\n7,7,8,7,7\r\n7,7,8,7,7" },
+                { "Column 1, Row 0", "6,6,2,2,2\r\n4,4,6,2,2\r\n4,4,4,2,2\r\n4,4,4,4,4\r\n4,2,4,4,4" },
+                { "Column 1, Row 1", "9,9,9,4,9\r\n9,9,9,4,9\r\n9,9,9,4,9\r\n9,9,9,4,9\r\n9,9,9,2,9\r\n9,9,9,2,9\r\n9,9,9,2,9\r\n9,9,9,2,9\r\n2,2,2,2,9\r\n2,2,2,9,9" },
+                { "Column 1, Row 2", "8,8,8,8,8\r\n7,7,7,7,7\r\n6,8,7,8,6\r\n7,7,7,7,7\r\n7,7,8,7,7" },
+                { "Column 1, Row 3", "3,3,1,1,1\r\n1,3,1,1,1\r\n1,3,1,1,1\r\n1,3,1,1,1\r\n1,3,1,1,1\r\n1,3,3,3,1\r\n1,3,3,3,3\r\n1,3,1,1,3\r\n1,3,1,1,3\r\n9,9,9,9,9" },
+            }.WithPrefix("Easy Gallery 1:");
+        }
+    }
+
+    public static class DictionaryHelpers {
+        public static Dictionary<string, string> WithPrefix(this Dictionary<string, string> dict, string prefix) {
+            var newDict = new Dictionary<string, string>();
+            foreach (var row in dict) {
+                if (string.IsNullOrWhiteSpace(row.Value))
+                    continue;
+                if (row.Value.Contains("0"))
+                    throw new InvalidOperationException(string.Format("Picross solution can not contain zeroes! Level: {0}", prefix + " " + row.Key));
+                newDict.Add(prefix + " " + row.Key, row.Value);
+
+            }
+            return newDict;
+        }
+    }
+}
