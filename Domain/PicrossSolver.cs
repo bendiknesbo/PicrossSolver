@@ -19,7 +19,6 @@ namespace Domain {
         private Dictionary<int, Classifier> _items;
         private Selection _selection;
         private Func<int, int, Color> _getCell;
-        private int _iterationCounter;
         private string _readableString;
         private Dictionary<int, Classifier> _oppositeItems;
         private const int OutOfBoundsConst = -1;
@@ -36,21 +35,23 @@ namespace Domain {
         public void Solve() {
             _readableString = string.Empty;
             do {
-                _iterationCounter = 0;
                 SolveActually();
                 if (_cellCount == _paintedCount) break;
-            } while (_isDirty || _iterationCounter <= 3);
+                SolveActually();
+                if (_cellCount == _paintedCount) break;
+                SolveActually();
+                if (_cellCount == _paintedCount) break;
+            } while (_isDirty);
         }
 
         private void SolveActually() {
-
 #if DEBUG
             _readableString = WorkingGrid.ToReadableString();
 #endif
             do {
-                _iterationCounter++;
                 _isDirty = false;
                 Iterate(Selection.Row);
+                if (_cellCount == _paintedCount) break;
                 Iterate(Selection.Column);
                 if (_cellCount == _paintedCount) break;
             } while (_isDirty);

@@ -3,14 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Domain;
 
 namespace DomainTests {
 
     public static class LevelFactory {
 
         public static Dictionary<string, string> GetAll() {
-            DirectoryInfo dir = new DirectoryInfo(Environment.CurrentDirectory);
             var dict = new Dictionary<string, string>();
             FillDictRecursive(Environment.CurrentDirectory, dict);
             return dict;
