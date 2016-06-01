@@ -34,18 +34,26 @@ namespace Domain {
         }
 
         public void Solve() {
+            _readableString = string.Empty;
+            do {
+                _iterationCounter = 0;
+                SolveActually();
+                if (_cellCount == _paintedCount) break;
+            } while (_isDirty || _iterationCounter <= 3);
+        }
+
+        private void SolveActually() {
+
 #if DEBUG
             _readableString = WorkingGrid.ToReadableString();
 #endif
-            _iterationCounter = 0;
-            _readableString = string.Empty;
             do {
                 _iterationCounter++;
                 _isDirty = false;
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
                 if (_cellCount == _paintedCount) break;
-            } while (_isDirty || _iterationCounter <= 40);
+            } while (_isDirty);
         }
 
         private void SetupSelectionAndFields(Selection selection) {
