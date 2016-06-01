@@ -43,6 +43,7 @@ namespace DomainTests {
             var sb = new StringBuilder();
             var errorLevels = new List<string>();
             foreach (var level in _levels) {
+                GridHelpers.ResetCache();
                 var levelName = level.Key;
                 _gridString = level.Value;
                 Step step = Step.Setup;
@@ -99,21 +100,12 @@ Number of failing levels: {0}
         }
 
         [TestMethod]
-        public void GetRowCountFromImg() {
-            var filePath = @"LevelImages\SizeTest.png";
-            var rows = GridHelpers.GetRowCountFromImg(filePath);
-            Assert.AreEqual(5, rows);
-            var cols = GridHelpers.GetColumnCountFromImg(filePath);
-            Assert.AreEqual(3, cols);
-        }
-
-        [TestMethod]
         public void Easy_Gallery2() {
             _levels = LevelFactory.EasyGallery2();
             Run();
         }
         [TestMethod]
-        public void Medium_Gallery3() {
+        public void Medium_Gallery1() {
             _levels = LevelFactory.MediumGallery1();
             Run();
         }
@@ -189,12 +181,9 @@ Number of failing levels: {0}
 
         public int GetNumberOfElements(Color[,] grid, Func<Color, bool> evaluator) {
             int count = 0;
-            for (int i = 0; i < grid.GetLength(0); i++) {
-                var row = grid.GetRow(i);
-                for (int j = 0; j < row.Length; j++) {
-                    if (evaluator(grid[i, j]))
-                        count++;
-                }
+            foreach (var cell in grid) {
+                if (evaluator(cell))
+                    count++;
             }
             return count;
         }

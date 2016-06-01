@@ -42,13 +42,6 @@ namespace Domain {
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
                 if (_cellCount == _paintedCount) break;
-
-#if DEBUG
-                _readableString = WorkingGrid.ToReadableString();
-                if (_iterationCounter > 40) Console.WriteLine();
-#else
-                if (_iterationCounter > 40) break;
-#endif
             } while (_isDirty || _iterationCounter <= 40);
         }
 
@@ -77,9 +70,6 @@ namespace Domain {
                 var itemClassifier = item.Value;
 
                 foreach (var colorClassKvp in itemClassifier.Colors) {
-#if DEBUG
-                    _readableString = WorkingGrid.ToReadableString();
-#endif
                     var myColor = colorClassKvp.Key;
                     var colorClassifier = colorClassKvp.Value;
 
@@ -127,6 +117,18 @@ namespace Domain {
                             //continue?
                         }
                     }
+                    if (!colorClassifier.IsConnected) {
+                        //todo: kan eg få til denne men med ferdig utfylte plasser?
+                        var count = itemClassifier.Colors.Count(cc => cc.Value.Count > 0);
+                        if (count == 2) {
+                            var other = itemClassifier.Colors.First(cc => !cc.Key.Equals(myColor));
+                            if (other.Value.IsConnected) {
+                                FillCells(itemNumber, myColor, new List<int> { 0, _selectionCount - 1 });
+                                //continue;
+                            }
+                        }
+                    }
+
                     var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary(k => k.Key, v => v.Value);
                     if (possibleSpots.Count == colorClassifier.Count) {
                         FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
@@ -160,6 +162,21 @@ namespace Domain {
                                     Console.WriteLine("Wat??? breakpoint her...");
                                 } else {
                                     FillSelection(itemNumber, myColor, lastIndex - colorClassifier.Count + 1, lastIndex);
+                                }
+                            }
+                        } else if (!colorClassifier.IsConnected && colorClassifier.Count == 2) {
+                            //todo: Meir generell??
+                            Color[] workingArray = _getArray(itemNumber);
+                            var firstIndex = IndexOf(workingArray, myColor);
+                            if (firstIndex <= OutOfBoundsConst) {
+                                //do nothing
+                            } else {
+                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Key >= firstIndex - 1 && kvp.Key <= firstIndex + 1)).ToDictionary(k => k.Key, v => v.Value);
+                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && cc.Value.IsDone != true)).ToDictionary(k => k.Key, v => v.Value);
+                                if (newPossibleSpots.Count == colorClassifier.Count - 1) {
+                                    FillCells(itemNumber, myColor, newPossibleSpots.Keys.ToList());
+                                    colorClassifier.IsDone = true;
+                                    //continue
                                 }
                             }
                         } else {
@@ -244,6 +261,9 @@ namespace Domain {
                 WorkingGrid[row, column] = color;
                 _paintedCount++;
                 _isDirty = true;
+#if DEBUG
+                _readableString = WorkingGrid.ToReadableString();
+#endif
             }
         }
     }

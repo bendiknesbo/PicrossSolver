@@ -5,8 +5,8 @@ using System.Text;
 
 namespace Domain {
     public class PicrossGrid {
-        public int ColumnCount { get; private set; }
-        public int RowCount { get; private set; }
+        public int ColumnCount;
+        public int RowCount;
         public List<Color> UsedColors;
 
         public Color[,] AnswerGrid;
@@ -15,19 +15,15 @@ namespace Domain {
 
 
         public void InitFromGridString(string gridString) {
-            RowCount = GridHelpers.GetRowCountFromGridString(gridString);
-            ColumnCount = GridHelpers.GetColumnCountFromGridString(gridString);
-            UsedColors = GridHelpers.GetUsedColorsFromGridString(gridString);
-            AnswerGrid = GridHelpers.InitFromGridString(gridString, rowCount: RowCount, colCount: ColumnCount);
+            AnswerGrid = GridHelpers.InitFromGridString2(gridString, rowCount: out RowCount, colCount: out ColumnCount);
+            UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
             GenerateRowClassifiers();
             GenerateColumnClassifiers();
         }
 
         public void InitFromImg(string filePath) {
-            RowCount = GridHelpers.GetRowCountFromImg(filePath);
-            ColumnCount = GridHelpers.GetColumnCountFromImg(filePath);
-            UsedColors = GridHelpers.GetUsedColorsFromImg(filePath);
-            AnswerGrid = GridHelpers.InitFromImg(filePath);
+            AnswerGrid = GridHelpers.InitFromImg(filePath, rowCount: out RowCount, colCount: out ColumnCount);
+            UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
             GenerateRowClassifiers();
             GenerateColumnClassifiers();
         }

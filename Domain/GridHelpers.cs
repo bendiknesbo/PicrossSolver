@@ -1,18 +1,38 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Domain {
     public static class GridHelpers {
+        static GridHelpers() {
+            ResetCache();
+        }
+
+        private static Dictionary<Color, string> _cache;
+
+        public static void ResetCache() {
+            _cache = new Dictionary<Color, string> { { Color.Empty, "_" }, { Color.FromArgb(0), "_" } };
+            _cacheCounter = 0;
+        }
+        private static string validChars = "abcdefgh";
+
+        private static int _cacheCounter;
         public static string ToReadableString(this Color[,] grid) {
             int rowCount = grid.GetLength(0);
             int colCount = grid.GetLength(1);
             var sb = new StringBuilder();
             for (int i = 0; i < rowCount; i++) {
                 for (int j = 0; j < colCount; j++) {
-                    sb.Append(grid[i, j].ToArgb() + ",");
+                    if (!_cache.ContainsKey(grid[i, j])) {
+                        var charToInsert = validChars[_cacheCounter++].ToString();
+                        _cache[grid[i, j]] = charToInsert;
+                    }
+                    sb.Append(_cache[grid[i, j]]);
+                    sb.Append(",");
                 }
                 sb.Length -= 1;
                 sb.AppendLine();
@@ -20,24 +40,14 @@ namespace Domain {
             return sb.ToString();
         }
 
-        public static int GetRowCountFromGridString(string gridString) {
-            return gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length;
-        }
-
-        public static int GetColumnCountFromGridString(string gridString) {
-            var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            return rows[0].Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length;
-        }
-
-        public static List<Color> GetUsedColorsFromGridString(string gridString) {
+        public static List<Color> GetUsedColorsFromGrid(Color[,] grid) {
             var set = new List<Color>();
-            var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var row in rows) {
-                var cols = row.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Select(s => Color.FromArgb(int.Parse(s)));
-                set.AddRange(cols);
+            foreach (var cell in grid) {
+                set.Add(cell);
             }
             return set.Distinct().ToList();
         }
+
         public static Color[,] InitFromGridString(string gridString, int rowCount, int colCount) {
             var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -59,53 +69,42 @@ namespace Domain {
             return grid;
         }
 
-
-        public static int GetRowCountFromImg(string filePath) {
-            var bmp = new Bitmap(filePath);
-            return bmp.Height;
-        }
-
-        public static int GetColumnCountFromImg(string filePath) {
-            var bmp = new Bitmap(filePath);
-            return bmp.Width;
-        }
-
-        public static List<Color> GetUsedColorsFromImg(string filePath) {
-            var set = new List<Color>();
-            var bmp = new Bitmap(filePath);
-            for (int row = 0; row < bmp.Height; row++) {
-                for (int col = 0; col < bmp.Width; col++) {
-                    set.Add(bmp.GetPixel(row, col));
+        public static Color[,] InitFromGridString2(string gridString, out int rowCount, out int colCount) {
+            var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+            rowCount = rows.Length;
+            colCount = rows[0].Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length;
+            var grid = new Color[rowCount, colCount];
+            int rowCounter = 0;
+            foreach (var row in rows) {
+                var columns = row.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                int columnCounter = 0;
+                foreach (var column in columns) {
+                    var colorInt = int.Parse(column);
+                    Color color = Color.Empty;
+                    if (colorInt != 0)
+                        color = Color.FromArgb(colorInt);
+                    grid[rowCounter, columnCounter] = color;
+                    columnCounter++;
                 }
-            }
-            return set.Distinct().ToList();
-        }
-
-
-        public static Color[,] InitFromImg(string filePath) {
-            var bmp = new Bitmap(filePath);
-            var grid = new Color[bmp.Height, bmp.Width];
-            for (int row = 0; row < bmp.Height; row++) {
-                for (int col = 0; col < bmp.Width; col++) {
-                    grid[row, col] = bmp.GetPixel(row, col);
-                }
+                rowCounter++;
             }
             return grid;
         }
 
-
-        /*public static int[,] RotateMatrix(this int[,] matrix) {
-            int newRowCount = matrix.GetLength(1);
-            int newColCount = matrix.GetLength(0);
-            int[,] res = new int[newRowCount, newColCount];
-            for (int i = 0; i < newRowCount; i++) {
-                for (int j = 0; j < newColCount; j++) {
-                    var temp = matrix[j, i];
-                    res[i, j] = temp;
+        public static Color[,] InitFromImg(string filePath, out int rowCount, out int colCount) {
+            if (!File.Exists(filePath))
+                throw new FileNotFoundException(filePath);
+            var bmp = new Bitmap(filePath);
+            rowCount = bmp.Height;
+            colCount = bmp.Width;
+            var grid = new Color[bmp.Height, bmp.Width];
+            for (int row = 0; row < bmp.Height; row++) {
+                for (int col = 0; col < bmp.Width; col++) {
+                    grid[row, col] = bmp.GetPixel(x: col, y: row);
                 }
             }
-            return res;
-        }*/
+            return grid;
+        }
 
         public static Color[] GetRow(this Color[,] matrix, int n) {
             var colCount = matrix.GetLength(1);
