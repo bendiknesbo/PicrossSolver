@@ -117,8 +117,13 @@ namespace Domain {
                             continue;
                         } else {
                             if (0 + colorClassifier.Count > firstIndex) {
+                                int extraToTheLeft = 0;
+                                var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                                if (workingDict.Any(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty))) {
+                                    extraToTheLeft = workingDict.First(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty)).Key;
+                                }
                                 //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
-                                FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: 0 + colorClassifier.Count);
+                                FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: extraToTheLeft + colorClassifier.Count);
                             }
                             if (_selectionCount - colorClassifier.Count < lastIndex) {
                                 //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
