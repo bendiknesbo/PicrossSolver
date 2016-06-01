@@ -1,14 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Domain;
 
 namespace DomainTests {
 
     public static class LevelFactory {
+
+        public static Dictionary<string, string> GetAll() {
+            DirectoryInfo dir = new DirectoryInfo(Environment.CurrentDirectory);
+            var dict = new Dictionary<string, string>();
+            FillDictRecursive(Environment.CurrentDirectory, dict);
+            return dict;
+        }
+
+        public static void FillDictRecursive(string dirPath, Dictionary<string, string> dict) {
+            DirectoryInfo dir = new DirectoryInfo(dirPath);
+            DictionaryHelpers.FromFolder(dir.FullName, dict);
+            foreach (var childDir in dir.EnumerateDirectories()) {
+                FillDictRecursive(childDir.FullName, dict);
+            }
+        }
         //Small = 5x5
         //Medium = 10x5
         //Large = 10x10
-        //X-Large = 15x10
+        //XLarge = 15x10
         //template:
         /*
           { "Column x, Row y", @"" },
@@ -42,30 +60,10 @@ namespace DomainTests {
             }.WithPrefix("Easy Gallery 1:");
         }
 
-        public static Dictionary<string, string> EasyGallery1_FromImg() {
-            return new Dictionary<string, string>{
-                { "Small 01",  @"LevelImages\EasyGallery1\Small01.png" },
-                { "Small 02",  @"LevelImages\EasyGallery1\Small02.png" },
-                { "Small 03",  @"LevelImages\EasyGallery1\Small03.png" },
-                { "Small 04",  @"LevelImages\EasyGallery1\Small04.png" },
-                { "Small 05",  @"LevelImages\EasyGallery1\Small05.png" },
-                { "Small 06",  @"LevelImages\EasyGallery1\Small06.png" },
-                { "Small 07",  @"LevelImages\EasyGallery1\Small07.png" },
-                { "Small 08",  @"LevelImages\EasyGallery1\Small08.png" },
-                { "Small 09",  @"LevelImages\EasyGallery1\Small09.png" },
-                { "Small 10",  @"LevelImages\EasyGallery1\Small10.png" },
-                { "Small 11",  @"LevelImages\EasyGallery1\Small11.png" },
-                { "Small 12",  @"LevelImages\EasyGallery1\Small12.png" },
-                { "Small 13",  @"LevelImages\EasyGallery1\Small13.png" },
-                { "Medium 01", @"LevelImages\EasyGallery1\Medium01.png" },
-                { "Medium 02", @"LevelImages\EasyGallery1\Medium02.png" },
-                { "Medium 03", @"LevelImages\EasyGallery1\Medium03.png" },
-                { "Medium 04", @"LevelImages\EasyGallery1\Medium04.png" },
-                { "Medium 05", @"LevelImages\EasyGallery1\Medium05.png" },
-                { "Medium 06", @"LevelImages\EasyGallery1\Medium06.png" },
-                { "Medium 07", @"LevelImages\EasyGallery1\Medium07.png" },
-                }.WithPrefix("Easy Gallery 1:", fromFile: true);
-        }
+        public static Dictionary<string, string> EasyGallery1_Img() { return DictionaryHelpers.FromFolder(@"LevelImages\EasyGallery1\"); }
+        public static Dictionary<string, string> EasyGallery2_Img() { return DictionaryHelpers.FromFolder(@"LevelImages\EasyGallery2\"); }
+        public static Dictionary<string, string> EasyGallery3_Img() { return DictionaryHelpers.FromFolder(@"LevelImages\EasyGallery3\"); }
+        public static Dictionary<string, string> EasyGallery4_Img() { return DictionaryHelpers.FromFolder(@"LevelImages\EasyGallery4\"); }
 
         public static Dictionary<string, string> EasyGallery2() {
             return new Dictionary<string, string>{
@@ -81,16 +79,38 @@ namespace DomainTests {
     }
 
     public static class DictionaryHelpers {
-        public static Dictionary<string, string> WithPrefix(this Dictionary<string, string> dict, string prefix, bool fromFile = false) {
+        public static Dictionary<string, string> FromFolder(string folderPath, Dictionary<string, string> existingDict = null) {
+            var newDict = existingDict ?? new Dictionary<string, string>();
+            var dirInfo = new DirectoryInfo(folderPath);
+            if (!dirInfo.Exists) throw new DirectoryNotFoundException();
+            folderPath = folderPath.Split(new[] { @"\" }, StringSplitOptions.RemoveEmptyEntries).Last();
+            var folderPrefix = folderPath.SplitCamelCase();
+            foreach (var fileInfo in dirInfo.EnumerateFiles()) {
+                if (!fileInfo.Extension.Contains(".png")) continue;
+                var filePrefix = fileInfo.Name.SplitCamelCase();
+                newDict.Add(folderPrefix + ": " + filePrefix, fileInfo.FullName);
+
+            }
+            return newDict;
+        }
+        private static string SplitCamelCase(this string s) {
+            Regex upperCaseRegex = new Regex(@"[A-Z][a-z]*|\d+");
+            MatchCollection matches = upperCaseRegex.Matches(s);
+            List<string> words = new List<string>();
+            foreach (Match match in matches) {
+                words.Add(match.Value);
+            }
+            return String.Join(" ", words.ToArray());
+        }
+
+        public static Dictionary<string, string> WithPrefix(this Dictionary<string, string> dict, string prefix) {
             var newDict = new Dictionary<string, string>();
             foreach (var row in dict) {
                 if (string.IsNullOrWhiteSpace(row.Value))
                     continue;
-                var newValue = row.Value;
-                if (!fromFile && newValue.Contains("0"))
+                if (row.Value.Contains("0"))
                     throw new InvalidOperationException(string.Format("Picross solution can not contain zeroes! Level: {0}", prefix + " " + row.Key));
-                newDict.Add(prefix + " " + row.Key, newValue);
-
+                newDict.Add(prefix + " " + row.Key, row.Value);
             }
             return newDict;
         }

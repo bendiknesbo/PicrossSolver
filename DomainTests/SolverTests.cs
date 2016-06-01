@@ -95,8 +95,34 @@ Number of failing levels: {0}
         }
         [TestMethod]
         public void Easy_Gallery1_FromImg() {
-            _levels = LevelFactory.EasyGallery1_FromImg();
+            _levels = LevelFactory.EasyGallery1_Img();
             Run(fromFile: true);
+            Assert.AreEqual(20, _levels.Count);
+        }
+        [TestMethod]
+        public void Easy_Gallery2_FromImg() {
+            _levels = LevelFactory.EasyGallery2_Img();
+            Run(fromFile: true);
+            Assert.AreEqual(20, _levels.Count);
+        }
+        [TestMethod]
+        public void Easy_Gallery3_FromImg() {
+            _levels = LevelFactory.EasyGallery3_Img();
+            Run(fromFile: true);
+            Assert.AreEqual(20, _levels.Count);
+        }
+        [TestMethod]
+        public void Easy_Gallery4_FromImg() {
+            _levels = LevelFactory.EasyGallery4_Img();
+            Run(fromFile: true);
+            Assert.AreEqual(20, _levels.Count);
+        }
+
+        [TestMethod]
+        public void Easy_All() {
+            _levels = LevelFactory.GetAll();
+            Run(fromFile: true);
+            Assert.AreEqual(-1, _levels.Count);
         }
 
         [TestMethod]

@@ -101,6 +101,8 @@ namespace Domain {
             for (int row = 0; row < bmp.Height; row++) {
                 for (int col = 0; col < bmp.Width; col++) {
                     grid[row, col] = bmp.GetPixel(x: col, y: row);
+                    if (grid[row, col].A == 0)
+                        throw new Exception("Invalid color!");
                 }
             }
             return grid;

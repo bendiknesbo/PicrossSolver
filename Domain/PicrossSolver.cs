@@ -34,6 +34,9 @@ namespace Domain {
         }
 
         public void Solve() {
+#if DEBUG
+            _readableString = WorkingGrid.ToReadableString();
+#endif
             _iterationCounter = 0;
             _readableString = string.Empty;
             do {
@@ -79,13 +82,13 @@ namespace Domain {
                     if (colorClassifier.Count == _selectionCount) {
                         FillSelection(itemNumber, myColor);
                         colorClassifier.IsDone = true;
-                        //continue;
+                        continue;
                     }
                     var others = itemClassifier.Colors.Values.Where(cc => cc.MyColor != colorClassifier.MyColor);
                     if (others.All(cc => cc.IsDone)) {
                         FillSelection(itemNumber, myColor);
                         colorClassifier.IsDone = true;
-                        //continue;
+                        continue;
                     }
                     if (colorClassifier.IsConnected) {
                         Color[] workingArray = _getArray(itemNumber);
@@ -97,12 +100,12 @@ namespace Domain {
                             //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
                             FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: colorClassifier.Count);
                             colorClassifier.IsDone = true;
-                            //continue;
+                            continue;
                         } else if (lastIndex == _selectionCount) {
                             //Eksempel: 0,0,0,0,2 + Count=3 -> 0,0,2,2,2
                             FillSelection(itemNumber, myColor, startIndex: lastIndex - colorClassifier.Count, endIndex: lastIndex);
                             colorClassifier.IsDone = true;
-                            //continue;
+                            continue;
                         } else {
                             if (0 + colorClassifier.Count > firstIndex) {
                                 //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
@@ -132,7 +135,8 @@ namespace Domain {
                     var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary(k => k.Key, v => v.Value);
                     if (possibleSpots.Count == colorClassifier.Count) {
                         FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
-                        //continue;
+                        colorClassifier.IsDone = true;
+                        continue;
                     } else {
                         //fleire mulige enn antall som skal til.
                         if (colorClassifier.IsConnected) {
@@ -176,13 +180,26 @@ namespace Domain {
                                 if (newPossibleSpots.Count == colorClassifier.Count - 1) {
                                     FillCells(itemNumber, myColor, newPossibleSpots.Keys.ToList());
                                     colorClassifier.IsDone = true;
-                                    //continue
+                                    continue;
                                 }
                             }
                         } else {
                             //todo...
                         }
                     }
+
+                    var possible2Spots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && !cc.Value.IsDone)).ToDictionary(k => k.Key, v => v.Value);
+                    var possible2Keys = possible2Spots.Select(kvp => kvp.Key).ToList();
+                    //note: possibleSpots2 includes the ones that are colored in..
+                    Color[] workingArray2 = _getArray(itemNumber);
+                    possible2Keys.RemoveAll(i => !workingArray2[i].Equals(Color.Empty));
+                    var countStillNeeded = colorClassifier.Count - workingArray2.Count(i => i.Equals(myColor));
+                    if (possible2Keys.Count == countStillNeeded) {
+                        FillCells(itemNumber, myColor, possible2Keys);
+                        colorClassifier.IsDone = true;
+                        continue;
+                    }
+
                 }
             }
         }
@@ -216,20 +233,20 @@ namespace Domain {
 
         private void FillCells(int itemNumber, Color color, List<int> oppositeItemNumbers) {
             if (_selection == Selection.Row)
-                ActualFillCellsInRow(itemNumber, color, oppositeItemNumbers);
+                ActualFillCellsInRow(itemNumber, color, colNumbers: oppositeItemNumbers);
             else
-                ActualFillCellsInColumn(itemNumber, color, oppositeItemNumbers);
+                ActualFillCellsInColumn(itemNumber, color, rowNumbers: oppositeItemNumbers);
         }
 
-        private void ActualFillCellsInRow(int itemNumber, Color color, List<int> oppositeItemNumbers) {
-            foreach (var opposite in oppositeItemNumbers) {
-                FillCellAndSetDirty(itemNumber, opposite, color);
+        private void ActualFillCellsInRow(int row, Color color, List<int> colNumbers) {
+            foreach (var col in colNumbers) {
+                FillCellAndSetDirty(row: row, column: col, color: color);
             }
         }
 
-        private void ActualFillCellsInColumn(int itemNumber, Color color, List<int> oppositeItemNumbers) {
-            foreach (var opposite in oppositeItemNumbers) {
-                FillCellAndSetDirty(opposite, itemNumber, color);
+        private void ActualFillCellsInColumn(int column, Color color, List<int> rowNumbers) {
+            foreach (var row in rowNumbers) {
+                FillCellAndSetDirty(row: row, column: column, color: color);
             }
         }
 
