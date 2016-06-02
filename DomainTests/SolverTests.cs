@@ -111,7 +111,7 @@ namespace DomainTests {
 
         [TestMethod]
         public void SelectiveTest() {
-            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 2: Large 01")).ToDictionary(k => k.Key, v => v.Value);
+            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 2: Large 01")).ToDictionary();
             Assert.AreEqual(1, _levels.Count);
             Run();
         }

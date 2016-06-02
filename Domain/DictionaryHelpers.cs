@@ -42,5 +42,8 @@ namespace Domain {
             return newDict;
         }
 
+        public static Dictionary<T1, T2> ToDictionary<T1,T2>(this IEnumerable<KeyValuePair<T1, T2>> enumerableDict) {
+            return enumerableDict.ToDictionary(k => k.Key, v => v.Value);
+        }
     }
 }

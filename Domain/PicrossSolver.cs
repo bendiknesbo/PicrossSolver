@@ -143,7 +143,7 @@ namespace Domain {
                         }
                     }
 
-                    var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary(k => k.Key, v => v.Value);
+                    var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary();
                     if (possibleSpots.Count == colorClassifier.Count) {
                         FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
                         colorClassifier.IsDone = true;
@@ -184,10 +184,15 @@ namespace Domain {
                             Color[] workingArray = _getArray(itemNumber);
                             var firstIndex = IndexOf(workingArray, myColor);
                             if (firstIndex <= OutOfBoundsConst) {
-                                //do nothing
+                                var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                                var temp = workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).ToDictionary();
+                                var first = temp.First().Key;
+                                if (temp.Count() == 3 && temp.ContainsKey(first + 1) && temp.ContainsKey(first + 2)) {
+                                    FillCells(itemNumber, myColor, new List<int> { first, first + 2 });
+                                }
                             } else {
-                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Key >= firstIndex - 1 && kvp.Key <= firstIndex + 1)).ToDictionary(k => k.Key, v => v.Value);
-                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && cc.Value.IsDone != true)).ToDictionary(k => k.Key, v => v.Value);
+                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Key >= firstIndex - 1 && kvp.Key <= firstIndex + 1)).ToDictionary();
+                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && cc.Value.IsDone != true)).ToDictionary();
                                 if (newPossibleSpots.Count == colorClassifier.Count - 1) {
                                     FillCells(itemNumber, myColor, newPossibleSpots.Keys.ToList());
                                     colorClassifier.IsDone = true;
@@ -199,7 +204,7 @@ namespace Domain {
                         }
                     }
 
-                    var possible2Spots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && !cc.Value.IsDone)).ToDictionary(k => k.Key, v => v.Value);
+                    var possible2Spots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && !cc.Value.IsDone)).ToDictionary();
                     var possible2Keys = possible2Spots.Select(kvp => kvp.Key).ToList();
                     //note: possibleSpots2 includes the ones that are colored in..
                     Color[] workingArray2 = _getArray(itemNumber);
