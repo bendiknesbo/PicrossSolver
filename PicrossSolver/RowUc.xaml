@@ -1,0 +1,22 @@
+﻿<UserControl x:Class="PicrossSolver.RowUc"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:domain="clr-namespace:Domain;assembly=Domain"
+             xmlns:picrossSolver="clr-namespace:PicrossSolver"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:RowPresenter}"
+             d:DesignHeight="30" d:DesignWidth="300" Margin="0" Padding="0" BorderThickness="0">
+    <ListBox VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ListBox.ItemTemplate>
+            <DataTemplate DataType="{x:Type domain:CellPresenter}">
+                <picrossSolver:CellUc Margin="0" Padding="0" BorderThickness="0" />
+            </DataTemplate>
+        </ListBox.ItemTemplate>
+    </ListBox>
+</UserControl>

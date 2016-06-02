@@ -15,7 +15,7 @@ namespace Domain {
 
 
         public void InitFromGridString(string gridString) {
-            AnswerGrid = GridHelpers.InitFromGridString2(gridString, rowCount: out RowCount, colCount: out ColumnCount);
+            AnswerGrid = GridHelpers.InitFromGridString(gridString, rowCount: out RowCount, colCount: out ColumnCount);
             UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
             GenerateRowClassifiers();
             GenerateColumnClassifiers();

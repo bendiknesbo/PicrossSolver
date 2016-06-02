@@ -8,232 +8,112 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests {
     [TestClass]
-    public class SolverTests {
-        private enum Step {
-            Setup,
-            Solve,
-            Assert,
+    public class SolverTests : SolverTestsBase {
+        protected override void GridInit() {
+            Grid.InitFromImg(InitString);
         }
 
-        private PicrossSolver _solver;
-        private string _gridString = @"
-0,0,0,0,0
-0,0,0,0,0
-0,0,0,0,0
-0,0,0,0,0
-0,0,0,0,0
-";
         private Dictionary<string, string> _levels;
-        private PicrossGrid _grid;
         private const string HorizontalSplitter = "******************************************";
 
-        [TestInitialize]
-        public void TestInit() { }
-
-        private void Setup(bool fromFile = false) {
-            _grid = new PicrossGrid();
-            if (fromFile)
-                _grid.InitFromImg(_gridString);
-            else
-                _grid.InitFromGridString(_gridString);
-            _solver = new PicrossSolver(_grid.RowCount, _grid.ColumnCount, _grid.Rows, _grid.Columns);
-        }
-
-        private void Run(bool fromFile = false) {
-            var sb = new StringBuilder();
+        private void Run() {
+            var errorSb = new StringBuilder();
             var errorLevels = new List<string>();
+            var inconclusiveLevels = new List<string>();
+            var inconclusiveSb = new StringBuilder();
             foreach (var level in _levels) {
                 GridHelpers.ResetCache();
                 var levelName = level.Key;
-                _gridString = level.Value;
+                InitString = level.Value;
                 Step step = Step.Setup;
                 try {
-                    Setup(fromFile: fromFile);
+                    Setup();
                     step = Step.Solve;
-                    _solver.Solve();
+                    Solver.Solve();
                     step = Step.Assert;
                     AssertMatrix();
                 } catch (Exception ex) {
-                    errorLevels.Add(levelName);
-                    sb.AppendLine();
-                    sb.AppendLine(string.Format("Failed during step: **{0}**", step));
-                    sb.AppendLine(string.Format("Failed during level: **{0}**", levelName));
-                    if (step == Step.Assert) {
-                        var solvedOnce = (Color[,]) _solver.WorkingGrid.Clone();
-                        _solver.Solve();
-                        var solvedTwice = (Color[,]) _solver.WorkingGrid.Clone();
-                        var expected = string.Format("Expected:{0}{1}", Environment.NewLine, _grid.AnswerGrid.ToReadableString());
-                        var actual1 = string.Format("Actual:   {0}{1}", Environment.NewLine, solvedOnce.ToReadableString());
-                        var actual2 = string.Format("Actual 2: {0}{1}", Environment.NewLine, solvedTwice.ToReadableString());
-                        var solvedSecondTime = AreEqualMatrices(solvedTwice, _grid.AnswerGrid);
-                        if (solvedSecondTime)
-                            sb.AppendLine("WOW! Was correctly solved with second Solve()!");
-                        sb.AppendLine(expected);
-                        sb.AppendLine(actual1);
-                        if (AreEqualMatrices(solvedOnce, solvedTwice))
-                            sb.AppendLine("Nothing changed when attempting to solve a second time." + Environment.NewLine);
-                        else
-                            sb.AppendLine(actual2);
+                    if (ex.Message.Contains("Invalid color!")) {
+                        inconclusiveLevels.Add(levelName);
+                        AppendLog(inconclusiveSb, ex, step, levelName);
+                    } else {
+                        errorLevels.Add(levelName);
+                        AppendLog(errorSb, ex, step, levelName);
                     }
-                    sb.AppendLine(string.Format("Exception: {0}", ex));
-                    sb.AppendLine(HorizontalSplitter);
                 }
             }
-            if (sb.Length != 0) {
-                sb.Insert(0, string.Format(@"
-Number of failing levels: {0}
-{1}
-", errorLevels.Count, HorizontalSplitter));
-                Assert.Fail(sb.ToString());
+            string totalOutput = Environment.NewLine;
+
+            if (errorSb.Length != 0) {
+                totalOutput += string.Format("Number of failing levels: {0}{1}", errorLevels.Count, Environment.NewLine);
+                errorSb.AppendLine(HorizontalSplitter);
             }
+            if (inconclusiveSb.Length != 0) {
+                totalOutput += string.Format("Number of inconclusive levels: {0}{1}", inconclusiveLevels.Count, Environment.NewLine);
+                inconclusiveSb.AppendLine(HorizontalSplitter);
+            }
+            totalOutput += HorizontalSplitter + errorSb + inconclusiveSb;
+            if (errorLevels.Any()) {
+                Assert.Fail(totalOutput);
+            }
+            if (inconclusiveLevels.Any()) {
+                Assert.Inconclusive(totalOutput);
+            }
+        }
+
+        private void AppendLog(StringBuilder sb, Exception ex, Step step, string levelName) {
+            sb.AppendLine();
+            sb.AppendLine(string.Format("Failed during step: **{0}**", step));
+            sb.AppendLine(string.Format("Failed during level: **{0}**", levelName));
+            if (step == Step.Assert) {
+                sb.AppendLine(string.Format("Expected:{0}{1}", Environment.NewLine, Grid.AnswerGrid.ToReadableString()));
+                sb.AppendLine(string.Format("Actual:   {0}{1}", Environment.NewLine, Solver.WorkingGrid.ToReadableString()));
+            }
+            sb.AppendLine(string.Format("Exception: {0}", ex));
+            sb.AppendLine();
+            sb.AppendLine(HorizontalSplitter);
         }
 
         [TestMethod]
         public void Easy_Gallery1() {
-            _levels = LevelFactory.EasyGallery1();
-            Run();
-        }
-        [TestMethod]
-        public void Easy_Gallery1_FromImg() {
             _levels = LevelFactory.EasyGallery1_Img();
-            Run(fromFile: true);
+            Run();
             Assert.AreEqual(20, _levels.Count);
         }
+
         [TestMethod]
-        public void Easy_Gallery2_FromImg() {
+        public void Easy_Gallery2() {
             _levels = LevelFactory.EasyGallery2_Img();
-            Run(fromFile: true);
+            Run();
             Assert.AreEqual(20, _levels.Count);
         }
+
         [TestMethod]
-        public void Easy_Gallery3_FromImg() {
+        public void Easy_Gallery3() {
             _levels = LevelFactory.EasyGallery3_Img();
-            Run(fromFile: true);
+            Run();
             Assert.AreEqual(20, _levels.Count);
         }
+
         [TestMethod]
-        public void Easy_Gallery4_FromImg() {
+        public void Easy_Gallery4() {
             _levels = LevelFactory.EasyGallery4_Img();
-            Run(fromFile: true);
+            Run();
             Assert.AreEqual(20, _levels.Count);
         }
 
         [TestMethod]
         public void Easy_All() {
             _levels = LevelFactory.GetAll();
-            Run(fromFile: true);
+            Run();
             Assert.AreEqual(-1, _levels.Count);
         }
 
         [TestMethod]
-        public void Easy_Gallery2() {
-            _levels = LevelFactory.EasyGallery2();
-            Run();
-        }
-        [TestMethod]
-        public void Medium_Gallery1() {
-            _levels = LevelFactory.MediumGallery1();
-            Run();
-        }
-
-        [TestMethod]
         public void SelectiveTest() {
-            _levels = LevelFactory.EasyGallery1().Where(kvp => kvp.Key.Contains("Column 0, Row 2")).ToDictionary(k => k.Key, v => v.Value);
+            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 2: Large 01")).ToDictionary(k => k.Key, v => v.Value);
+            Assert.AreEqual(1, _levels.Count);
             Run();
-        }
-
-
-        [TestMethod]
-        public void Easy_Gallery1_0_0() {
-            _gridString = @"
-1,1,1,1,1
-1,1,1,1,1
-2,2,2,1,1
-2,2,2,1,1
-2,2,2,1,1
-";
-            Setup();
-            Assert.AreEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => !i.Equals(Color.Empty)));
-            _solver.Solve();
-            Console.WriteLine(_solver.WorkingGrid.ToReadableString());
-            Assert.AreNotEqual(0, GetNumberOfElements(_solver.WorkingGrid, i => !i.Equals(Color.Empty)));
-            AssertMatrix();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery1_1_0() {
-            _gridString = @"
-3,3,1,3,3
-3,1,1,3,3
-3,3,1,3,3
-3,3,1,3,3
-3,1,1,1,3
-";
-            Setup();
-            _solver.Solve();
-            Console.WriteLine(_solver.WorkingGrid.ToReadableString());
-            AssertMatrix();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery1_2_0() {
-            _gridString = @"
-5,4,4,4,4
-5,4,5,5,4
-5,4,5,5,4
-4,4,5,4,4
-4,4,5,4,4
-";
-            Setup();
-            _solver.Solve();
-            Console.WriteLine(_solver.WorkingGrid.ToReadableString());
-            AssertMatrix();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery1_3_0() {
-            _gridString = @"
-1,1,1,1,1
-1,1,1,1,1
-3,3,3,3,3
-3,4,3,4,3
-3,4,3,3,3
-";
-            Setup();
-            _solver.Solve();
-            Console.WriteLine(_solver.WorkingGrid.ToReadableString());
-            AssertMatrix();
-        }
-
-        public int GetNumberOfElements(Color[,] grid, Func<Color, bool> evaluator) {
-            int count = 0;
-            foreach (var cell in grid) {
-                if (evaluator(cell))
-                    count++;
-            }
-            return count;
-        }
-
-        public void AssertMatrix() {
-            Assert.AreEqual(_grid.RowCount, _solver.WorkingGrid.GetLength(0));
-            Assert.AreEqual(_grid.ColumnCount, _solver.WorkingGrid.GetLength(1));
-            for (int i = 0; i < _grid.RowCount; i++) {
-                for (int j = 0; j < _grid.ColumnCount; j++) {
-                    Assert.AreEqual(_grid.AnswerGrid[i, j], _solver.WorkingGrid[i, j]);
-                }
-            }
-        }
-
-        public bool AreEqualMatrices(Color[,] expected, Color[,] actual) {
-            if (expected.GetLength(0) != actual.GetLength(0)) return false;
-            if (expected.GetLength(1) != actual.GetLength(1)) return false;
-            for (int i = 0; i < _grid.RowCount; i++) {
-                for (int j = 0; j < _grid.ColumnCount; j++) {
-                    if (!(expected[i, j].Equals(actual[i, j])))
-                        return false;
-                }
-            }
-            return true;
         }
     }
 }

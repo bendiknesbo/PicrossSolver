@@ -48,28 +48,7 @@ namespace Domain {
             return set.Distinct().ToList();
         }
 
-        public static Color[,] InitFromGridString(string gridString, int rowCount, int colCount) {
-            var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-
-            var grid = new Color[rowCount, colCount];
-            int rowCounter = 0;
-            foreach (var row in rows) {
-                var columns = row.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
-                int columnCounter = 0;
-                foreach (var column in columns) {
-                    var colorInt = int.Parse(column);
-                    Color color = Color.Empty;
-                    if (colorInt != 0)
-                        color = Color.FromArgb(colorInt);
-                    grid[rowCounter, columnCounter] = color;
-                    columnCounter++;
-                }
-                rowCounter++;
-            }
-            return grid;
-        }
-
-        public static Color[,] InitFromGridString2(string gridString, out int rowCount, out int colCount) {
+        public static Color[,] InitFromGridString(string gridString, out int rowCount, out int colCount) {
             var rows = gridString.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
             rowCount = rows.Length;
             colCount = rows[0].Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries).Length;
