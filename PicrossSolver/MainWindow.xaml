@@ -7,43 +7,48 @@
         xmlns:picrossSolver="clr-namespace:PicrossSolver"
         Title="MainWindow" Height="800" Width="600"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:GridPresenter}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" MinHeight="120" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="120"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Load demo" Click="LoadDemo_OnClick" />
-        <ListBox x:Name="ColumnClassifiers" Grid.Row="1" Grid.Column="1"  ItemsSource="{Binding ColumnClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type domain:Classifier}">
-                    <picrossSolver:ColumnClassifierUc />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <ListBox x:Name="RowClassifiers" Grid.Row="2" Grid.Column="0" ItemsSource="{Binding RowClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type domain:Classifier}">
-                    <picrossSolver:RowClassifierUc />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
-        <ListBox x:Name="MainGrid" Grid.Row="2" Grid.Column="1"  ItemsSource="{Binding Rows}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type domain:RowPresenter}">
-                    <picrossSolver:RowUc />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+    <DockPanel LastChildFill="True">
+        <UniformGrid x:Name="FunctionsGrid" DockPanel.Dock="Top" Columns="3">
+            <Button Grid.Column="0"  Content="Load demo" Click="LoadDemo_OnClick" />
+            <Button Grid.Column="1"  Content="Load specific" Click="LoadSpecific_OnClick" />
+            <Button Grid.Column="1"  Content="Show all classifiers" Click="ShowAllClassifiers_OnClick" />
+        </UniformGrid>
+        <Grid DockPanel.Dock="Bottom">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" MinHeight="120" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="120"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="ColumnClassifiers" Grid.Row="0" Grid.Column="1"  ItemsSource="{Binding ColumnClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type domain:Classifier}">
+                        <picrossSolver:ColumnClassifierUc />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox x:Name="RowClassifiers" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding RowClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type domain:Classifier}">
+                        <picrossSolver:RowClassifierUc />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox x:Name="MainGrid" Grid.Row="1" Grid.Column="1"  ItemsSource="{Binding Rows}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type domain:RowPresenter}">
+                        <picrossSolver:RowUc />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
 
-    </Grid>
+        </Grid>
+    </DockPanel>
 </Window>

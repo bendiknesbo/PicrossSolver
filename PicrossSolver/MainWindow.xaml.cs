@@ -18,5 +18,14 @@ namespace PicrossSolver {
         private void LoadDemo_OnClick(object sender, RoutedEventArgs e) {
             ViewModel.LoadDemoData();
         }
+
+        private void LoadSpecific_OnClick(object sender, RoutedEventArgs e) {
+            ViewModel.LoadSpecificData();
+        }
+
+        private void ShowAllClassifiers_OnClick(object sender, RoutedEventArgs e) {
+            CellPresenter.ShowAllClassifiers = !CellPresenter.ShowAllClassifiers;
+            ViewModel.NotifyClassifiers();
+        }
     }
 }

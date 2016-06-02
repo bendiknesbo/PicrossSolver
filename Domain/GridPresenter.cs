@@ -31,26 +31,36 @@ namespace Domain {
         }
 
         public void LoadDemoData() {
-            GridHelpers.ResetCache();
-            _grid = new PicrossGrid();
+            var demoPath = string.Empty;
             switch (_demoSelection) {
                 case 0:
-                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Small01.png");
+                    demoPath = @"LevelImages\EasyGallery2\Small01.png";
                     break;
                 case 1:
-                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Medium01.png");
+                    demoPath = @"LevelImages\EasyGallery2\Medium01.png";
                     break;
                 case 2:
-                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Large01.png");
+                    demoPath = @"LevelImages\EasyGallery2\Large01.png";
                     break;
                 case 3:
-                    _grid.InitFromImg(@"LevelImages\EasyGallery4\XLarge01.png");
+                    demoPath = @"LevelImages\EasyGallery4\XLarge01.png";
                     break;
                 default:
                     throw new Exception("Unknown _demoSelection");
             }
             _demoSelection++;
             if (_demoSelection == 4) _demoSelection = 0;
+            LoadData(demoPath);
+        }
+        public void LoadSpecificData() {
+            var specificPath = @"LevelImages\EasyGallery2\Large07.png";
+            LoadData(specificPath);
+        }
+
+        private void LoadData(string path) {
+            GridHelpers.ResetCache();
+            _grid = new PicrossGrid();
+            _grid.InitFromImg(path);
             _solver = new PicrossSolver(_grid.RowCount, _grid.ColumnCount, _grid.Rows, _grid.Columns);
             _solver.Solve();
             Rows = new List<RowPresenter>();
@@ -60,6 +70,11 @@ namespace Domain {
             Notify(() => Rows);
             RowClassifiers = _solver.Rows.Select(kvp => new ClassifierPresenter(kvp.Value)).ToList();
             ColumnClassifiers = _solver.Columns.Select(kvp => new ClassifierPresenter(kvp.Value)).ToList();
+        }
+
+        public void NotifyClassifiers() {
+            RowClassifiers.ForEach(c=>c.NotifyVisibility());
+            ColumnClassifiers.ForEach(c => c.NotifyVisibility());
         }
     }
 
@@ -81,9 +96,15 @@ namespace Domain {
         public ClassifierPresenter(Classifier row) {
             Cells = row.Colors.Select(kvp => new CellPresenter(kvp.Value)).ToList();
         }
+
+        public void NotifyVisibility() {
+            Cells.ForEach(c => c.NotifyVisibility());
+        }
     }
 
     public class CellPresenter : Notifiable {
+        public static bool ShowAllClassifiers = false;
+
         private SolidColorBrush _myColor = Brushes.Transparent;
         public SolidColorBrush MyColor {
             get { return _myColor; }
@@ -113,7 +134,7 @@ namespace Domain {
         }
 
         public Visibility CellVisibility {
-            get { return IsDone ? Visibility.Hidden : Visibility.Visible; }
+            get { return ShowAllClassifiers || !IsDone ? Visibility.Visible : Visibility.Hidden; }
         }
 
         public CellPresenter(DColor color) {
@@ -125,6 +146,10 @@ namespace Domain {
             Count = value.Count.ToString();
             IsConnected = value.IsConnected;
             IsDone = value.IsDone;
+        }
+
+        public void NotifyVisibility() {
+            Notify(() => CellVisibility);
         }
     }
 

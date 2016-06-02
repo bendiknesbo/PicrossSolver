@@ -6,10 +6,12 @@
              xmlns:domain="clr-namespace:Domain;assembly=Domain"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:CellPresenter}"
              Height="30" Width="30" Visibility="{Binding CellVisibility}">
-    <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
-        <Grid>
-            <Ellipse Visibility="{Binding IsConnectedVisibility}"/>
-            <TextBlock Text="{Binding Count}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
-        </Grid>
-    </Border>
+    <Viewbox>
+        <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
+            <Grid Width="30" Height="30">
+                <Ellipse Stroke="Black" Visibility="{Binding IsConnectedVisibility}"/>
+                <TextBlock Text="{Binding Count}" FontSize="20"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+            </Grid>
+        </Border>
+    </Viewbox>
 </UserControl>
