@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using MColor = System.Windows.Media.Color;
 using DColor = System.Drawing.Color;
 
@@ -105,8 +106,8 @@ namespace Domain {
     public class CellPresenter : Notifiable {
         public static bool ShowAllClassifiers = false;
 
-        private SolidColorBrush _myColor = Brushes.Transparent;
-        public SolidColorBrush MyColor {
+        private Brush _myColor = Brushes.Transparent;
+        public Brush MyColor {
             get { return _myColor; }
             set { SetNotify(() => MyColor, ref _myColor, value); }
         }
@@ -138,7 +139,11 @@ namespace Domain {
         }
 
         public CellPresenter(DColor color) {
-            MyColor = new SolidColorBrush(color.ToMediaColor());
+            if (color == DColor.Empty) {
+                MyColor = new ImageBrush(new BitmapImage(new Uri(@"pack://application:,,,/img/checkers.png")));
+            } else {
+                MyColor = new SolidColorBrush(color.ToMediaColor());
+            }
         }
 
         public CellPresenter(ColorClassifier value) {
