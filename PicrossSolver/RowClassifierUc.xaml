@@ -6,8 +6,8 @@
              xmlns:domain="clr-namespace:Domain;assembly=Domain"
              xmlns:picrossSolver="clr-namespace:PicrossSolver"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:ClassifierPresenter}"
-             d:DesignHeight="30" d:DesignWidth="120" Margin="0" Padding="0" BorderThickness="0">
-    <ListBox VerticalAlignment="Stretch" HorizontalAlignment="Stretch" ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+             d:DesignHeight="30" d:DesignWidth="120" >
+    <ListBox ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal" />
@@ -15,7 +15,7 @@
         </ItemsControl.ItemsPanel>
         <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type domain:CellPresenter}">
-                <picrossSolver:CellUc Margin="0" Padding="0" BorderThickness="0" />
+                <picrossSolver:CellUc />
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>

@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
+using System.Windows;
 using System.Windows.Media;
-using Domain.Annotations;
 using MColor = System.Windows.Media.Color;
 using DColor = System.Drawing.Color;
 
@@ -15,11 +13,11 @@ namespace Domain {
         private PicrossSolver _solver;
 
         private List<RowPresenter> _rows;
-
         public List<RowPresenter> Rows {
             get { return _rows; }
             set { SetNotify(() => Rows, ref _rows, value); }
         }
+
         private List<ClassifierPresenter> _rowClassifiers;
         public List<ClassifierPresenter> RowClassifiers {
             get { return _rowClassifiers; }
@@ -36,11 +34,20 @@ namespace Domain {
             GridHelpers.ResetCache();
             _grid = new PicrossGrid();
             switch (_demoSelection) {
-                case 0: _grid.InitFromImg(@"LevelImages\EasyGallery2\Small01.png");break;
-                case 1: _grid.InitFromImg(@"LevelImages\EasyGallery2\Medium01.png"); break;
-                case 2: _grid.InitFromImg(@"LevelImages\EasyGallery2\Large01.png"); break;
-                case 3: _grid.InitFromImg(@"LevelImages\EasyGallery4\XLarge01.png"); break;
-                default:throw new Exception("Unknown _demoSelection");
+                case 0:
+                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Small01.png");
+                    break;
+                case 1:
+                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Medium01.png");
+                    break;
+                case 2:
+                    _grid.InitFromImg(@"LevelImages\EasyGallery2\Large01.png");
+                    break;
+                case 3:
+                    _grid.InitFromImg(@"LevelImages\EasyGallery4\XLarge01.png");
+                    break;
+                default:
+                    throw new Exception("Unknown _demoSelection");
             }
             _demoSelection++;
             if (_demoSelection == 4) _demoSelection = 0;
@@ -78,7 +85,6 @@ namespace Domain {
 
     public class CellPresenter : Notifiable {
         private SolidColorBrush _myColor = Brushes.Transparent;
-
         public SolidColorBrush MyColor {
             get { return _myColor; }
             set { SetNotify(() => MyColor, ref _myColor, value); }
@@ -96,6 +102,20 @@ namespace Domain {
             set { SetNotify(() => IsConnected, ref _isConnected, value); }
         }
 
+        public Visibility IsConnectedVisibility {
+            get { return IsConnected ? Visibility.Visible : Visibility.Collapsed; }
+        }
+
+        private bool _isDone;
+        public bool IsDone {
+            get { return _isDone; }
+            set { SetNotify(() => IsDone, ref _isDone, value); }
+        }
+
+        public Visibility CellVisibility {
+            get { return IsDone ? Visibility.Hidden : Visibility.Visible; }
+        }
+
         public CellPresenter(DColor color) {
             MyColor = new SolidColorBrush(color.ToMediaColor());
         }
@@ -104,6 +124,7 @@ namespace Domain {
             MyColor = new SolidColorBrush(value.MyColor.ToMediaColor());
             Count = value.Count.ToString();
             IsConnected = value.IsConnected;
+            IsDone = value.IsDone;
         }
     }
 

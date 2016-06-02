@@ -5,8 +5,11 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:domain="clr-namespace:Domain;assembly=Domain"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:CellPresenter}"
-             Height="30" Width="30" Margin="0" Padding="0">
+             Height="30" Width="30" Visibility="{Binding CellVisibility}">
     <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
-        <TextBlock Text="{Binding Count}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
+        <Grid>
+            <Ellipse Visibility="{Binding IsConnectedVisibility}"/>
+            <TextBlock Text="{Binding Count}" VerticalAlignment="Center" HorizontalAlignment="Center" FontSize="20"/>
+        </Grid>
     </Border>
 </UserControl>

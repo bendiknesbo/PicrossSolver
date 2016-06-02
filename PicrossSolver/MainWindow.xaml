@@ -18,7 +18,7 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Button Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Content="Load demo" Click="LoadDemo_OnClick" />
-        <ListBox x:Name="ColumnClassifiers" Grid.Row="1" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding ColumnClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+        <ListBox x:Name="ColumnClassifiers" Grid.Row="1" Grid.Column="1"  ItemsSource="{Binding ColumnClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <WrapPanel Orientation="Horizontal" />
@@ -26,18 +26,18 @@
             </ItemsControl.ItemsPanel>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type domain:Classifier}">
-                    <picrossSolver:ColumnClassifierUc Margin="0" Padding="0" BorderThickness="0" />
+                    <picrossSolver:ColumnClassifierUc />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ListBox x:Name="RowClassifiers" Grid.Row="2" Grid.Column="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding RowClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+        <ListBox x:Name="RowClassifiers" Grid.Row="2" Grid.Column="0" ItemsSource="{Binding RowClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type domain:Classifier}">
-                    <picrossSolver:RowClassifierUc Margin="0" Padding="0" BorderThickness="0" />
+                    <picrossSolver:RowClassifierUc />
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <ListBox x:Name="MainGrid" Grid.Row="2" Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" ItemsSource="{Binding Rows}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" BorderThickness="0">
+        <ListBox x:Name="MainGrid" Grid.Row="2" Grid.Column="1"  ItemsSource="{Binding Rows}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type domain:RowPresenter}">
                     <picrossSolver:RowUc />
