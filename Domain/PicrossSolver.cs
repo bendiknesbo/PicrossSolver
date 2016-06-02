@@ -36,9 +36,7 @@ namespace Domain {
             _readableString = string.Empty;
             do {
                 SolveActually();
-                if (_cellCount == _paintedCount) break;
                 SolveActually();
-                if (_cellCount == _paintedCount) break;
                 SolveActually();
                 if (_cellCount == _paintedCount) break;
             } while (_isDirty);
@@ -51,7 +49,6 @@ namespace Domain {
             do {
                 _isDirty = false;
                 Iterate(Selection.Row);
-                if (_cellCount == _paintedCount) break;
                 Iterate(Selection.Column);
                 if (_cellCount == _paintedCount) break;
             } while (_isDirty);
