@@ -53,6 +53,7 @@ namespace Domain {
                 _isDirty = false;
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
+                IterateCells();
                 if (_cellCount == _paintedCount) break;
             } while (_isDirty);
         }
@@ -71,6 +72,24 @@ namespace Domain {
                 _selectionCount = _rowCount;
                 _getArray = (colNumber => WorkingGrid.GetColumn(colNumber));
                 _getCell = ((x, y) => WorkingGrid[y, x]);
+            }
+        }
+
+        /// <summary>
+        /// Might be slow and not actually solve anything... possibly remove in futue...
+        /// </summary>
+        private void IterateCells() {
+            for (int rowIdx = 0; rowIdx < _rowCount; rowIdx++) {
+                for (int colIdx = 0; colIdx < _colCount; colIdx++) {
+                    var row = Rows.First(r => r.Index == rowIdx);
+                    var col = Columns.First(c => c.Index == colIdx);
+                    var rowColors = row.Colors.Where(c => !c.IsDone);
+                    var colColors = col.Colors.Where(c => !c.IsDone);
+                    var possibleColorsForCell = rowColors.Intersect(colColors).ToList();
+                    if (possibleColorsForCell.Count == 1) {
+                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single().MyColor);
+                    }
+                }
             }
         }
 
@@ -388,8 +407,8 @@ namespace Domain {
             }
         }
 
-        private void FillCellAndSetDirty(int row, int column) {
-            var color = _currentColor.MyColor;
+        private void FillCellAndSetDirty(int row, int column, Color? colorToFill = null) {
+            var color = colorToFill ?? _currentColor.MyColor;
             if (WorkingGrid[row, column].Equals(Color.Empty)) {
                 WorkingGrid[row, column] = color;
                 _paintedCount++;
