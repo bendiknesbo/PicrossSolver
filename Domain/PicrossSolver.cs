@@ -215,8 +215,63 @@ namespace Domain {
                         continue;
                     }
 
+                    if (colorClassifier.IsConnected) {
+                        Color[] workingArray = _getArray(itemNumber);
+                        var firstIndex = IndexOf(workingArray, myColor);
+                        var lastIndex = LastIndexOf(workingArray, myColor);
+                        if (firstIndex <= OutOfBoundsConst) {
+                            //do nothing
+                        } else {
+                            var workingDict2 = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                            workingDict2 = FilterAwayNonTouchingSlots(workingDict2, firstIndex, myColor);
+                            if (firstIndex == workingDict2.First().Key) {
+                                FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: firstIndex + colorClassifier.Count);
+                                colorClassifier.IsDone = true;
+                                continue;
+                            } else if (lastIndex == workingDict2.Last().Key) {
+                                FillSelection(itemNumber, myColor, startIndex: lastIndex - colorClassifier.Count + 1, endIndex: workingDict2.Last().Key);
+                                colorClassifier.IsDone = true;
+                                continue;
+                            } else {
+                                if (workingDict2.First().Key + colorClassifier.Count > firstIndex) {
+                                    FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: workingDict2.First().Key + colorClassifier.Count);
+                                }
+                                if (workingDict2.Last().Key - colorClassifier.Count + 1 < lastIndex) {
+                                    FillSelection(itemNumber, myColor, startIndex: workingDict2.Last().Key - colorClassifier.Count + 1, endIndex: lastIndex);
+                                }
+                                FillSelection(itemNumber, myColor, startIndex: firstIndex, endIndex: lastIndex);
+                                //continue?
+                            }
+
+
+                        }
+                    }
+
                 }
             }
+        }
+
+        private Dictionary<int, Color> FilterAwayNonTouchingSlots(Dictionary<int, Color> openSlots, int anyIndex, Color color) {
+            var tempDict = new Dictionary<int, Color>();
+            int tempIndex = anyIndex;
+            while (tempIndex >= 0) {
+                var cell = openSlots[tempIndex];
+                if (!cell.Equals(color) && !cell.Equals(Color.Empty)) {
+                    break;
+                }
+                tempDict[tempIndex] = cell;
+                tempIndex--;
+            }
+            tempIndex = anyIndex;
+            while (tempIndex < _selectionCount) {
+                var cell = openSlots[tempIndex];
+                if (!cell.Equals(color) && !cell.Equals(Color.Empty)) {
+                    break;
+                }
+                tempDict[tempIndex] = cell;
+                tempIndex++;
+            }
+            return tempDict.OrderBy(kvp => kvp.Key).ToDictionary();
         }
 
         private int IndexOf(Color[] arr, Color color) {

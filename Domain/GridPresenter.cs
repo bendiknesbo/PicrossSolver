@@ -55,15 +55,17 @@ namespace Domain {
         }
         public void LoadSpecificData() {
             var specificPath = @"LevelImages\EasyGallery2\Large07.png";
-            LoadData(specificPath);
+            LoadData(specificPath, doubleSolve: true);
         }
 
-        private void LoadData(string path) {
+        private void LoadData(string path, bool doubleSolve = false) {
             GridHelpers.ResetCache();
             _grid = new PicrossGrid();
             _grid.InitFromImg(path);
             _solver = new PicrossSolver(_grid.RowCount, _grid.ColumnCount, _grid.Rows, _grid.Columns);
             _solver.Solve();
+            if (doubleSolve)
+                _solver.Solve();
             Rows = new List<RowPresenter>();
             for (int i = 0; i < _grid.RowCount; i++) {
                 Rows.Add(new RowPresenter(_solver.WorkingGrid.GetRow(i)));
