@@ -43,6 +43,7 @@
     <Compile Include="DictionaryHelpers.cs" />
     <Compile Include="GridHelpers.cs" />
     <Compile Include="GridPresenter.cs" />
+    <Compile Include="IntRange.cs" />
     <Compile Include="LevelFactory.cs" />
     <Compile Include="Notifiable.cs" />
     <Compile Include="PicrossGrid.cs" />

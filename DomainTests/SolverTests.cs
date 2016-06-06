@@ -16,7 +16,7 @@ namespace DomainTests {
         private Dictionary<string, string> _levels;
         private const string HorizontalSplitter = "******************************************";
 
-        private void Run() {
+        private void Run(bool doubleSolve = false) {
             var errorSb = new StringBuilder();
             var errorLevels = new List<string>();
             var inconclusiveLevels = new List<string>();
@@ -30,6 +30,8 @@ namespace DomainTests {
                     Setup();
                     step = Step.Solve;
                     Solver.Solve();
+                    if (doubleSolve)
+                        Solver.Solve();
                     step = Step.Assert;
                     AssertMatrix();
                 } catch (Exception ex) {
@@ -113,9 +115,9 @@ namespace DomainTests {
 
         [TestMethod]
         public void SelectiveTest() {
-            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 2: Large 01")).ToDictionary();
+            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
             Assert.AreEqual(1, _levels.Count);
-            Run();
+            Run(doubleSolve: true);
         }
     }
 }

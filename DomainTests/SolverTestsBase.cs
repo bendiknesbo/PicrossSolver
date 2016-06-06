@@ -25,7 +25,9 @@ namespace DomainTests {
         protected void Setup() {
             Grid = new PicrossGrid();
             GridInit();
-            Solver = new PicrossSolver(Grid.RowCount, Grid.ColumnCount, Grid.Rows, Grid.Columns);
+            Solver = new PicrossSolver(Grid.RowCount, Grid.ColumnCount, Grid.Rows, Grid.Columns) {
+                AnswerGrid = Grid.AnswerGrid
+            };
         }
 
         public void AssertMatrix() {
