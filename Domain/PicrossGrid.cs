@@ -10,8 +10,8 @@ namespace Domain {
         public List<Color> UsedColors;
 
         public Color[,] AnswerGrid;
-        public Dictionary<int, Classifier> Rows = new Dictionary<int, Classifier>();
-        public Dictionary<int, Classifier> Columns = new Dictionary<int, Classifier>();
+        public List<Classifier> Rows = new List<Classifier>();
+        public List<Classifier> Columns = new List<Classifier>();
 
 
         public void InitFromGridString(string gridString) {
@@ -32,14 +32,14 @@ namespace Domain {
         private void GenerateRowClassifiers() {
             for (int i = 0; i < RowCount; i++) {
                 var row = AnswerGrid.GetRow(i);
-                Rows.Add(i, new Classifier(UsedColors, row));
+                Rows.Add(new Classifier(i, UsedColors, row));
             }
         }
 
         private void GenerateColumnClassifiers() {
             for (int i = 0; i < ColumnCount; i++) {
                 var column = AnswerGrid.GetColumn(i);
-                Columns.Add(i, new Classifier(UsedColors, column));
+                Columns.Add(new Classifier(i, UsedColors, column));
             }
         }
 

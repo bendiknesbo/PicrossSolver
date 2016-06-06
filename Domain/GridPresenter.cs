@@ -69,12 +69,12 @@ namespace Domain {
                 Rows.Add(new RowPresenter(_solver.WorkingGrid.GetRow(i)));
             }
             Notify(() => Rows);
-            RowClassifiers = _solver.Rows.Select(kvp => new ClassifierPresenter(kvp.Value)).ToList();
-            ColumnClassifiers = _solver.Columns.Select(kvp => new ClassifierPresenter(kvp.Value)).ToList();
+            RowClassifiers = _solver.Rows.Select(r => new ClassifierPresenter(r)).ToList();
+            ColumnClassifiers = _solver.Columns.Select(c => new ClassifierPresenter(c)).ToList();
         }
 
         public void NotifyClassifiers() {
-            RowClassifiers.ForEach(c=>c.NotifyVisibility());
+            RowClassifiers.ForEach(c => c.NotifyVisibility());
             ColumnClassifiers.ForEach(c => c.NotifyVisibility());
         }
     }
@@ -94,8 +94,8 @@ namespace Domain {
     }
 
     public class ClassifierPresenter : RowPresenterBase {
-        public ClassifierPresenter(Classifier row) {
-            Cells = row.Colors.Select(kvp => new CellPresenter(kvp.Value)).ToList();
+        public ClassifierPresenter(Classifier classifier) {
+            Cells = classifier.Colors.Select(c => new CellPresenter(c)).ToList();
         }
 
         public void NotifyVisibility() {

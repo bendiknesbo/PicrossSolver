@@ -5,8 +5,8 @@ using System.Linq;
 
 namespace Domain {
     public class PicrossSolver {
-        public Dictionary<int, Classifier> Rows { get; private set; }
-        public Dictionary<int, Classifier> Columns { get; private set; }
+        public List<Classifier> Rows { get; private set; }
+        public List<Classifier> Columns { get; private set; }
 
         public Color[,] WorkingGrid;
         private readonly int _rowCount;
@@ -16,14 +16,14 @@ namespace Domain {
         private bool _isDirty;
         private Func<int, Color[]> _getArray;
         private int _selectionCount;
-        private Dictionary<int, Classifier> _items;
+        private List<Classifier> _items;
         private Selection _selection;
         private Func<int, int, Color> _getCell;
         private string _readableString;
-        private Dictionary<int, Classifier> _oppositeItems;
+        private List<Classifier> _oppositeItems;
         private const int OutOfBoundsConst = -1;
 
-        public PicrossSolver(int rowCount, int colCount, Dictionary<int, Classifier> rows, Dictionary<int, Classifier> columns) {
+        public PicrossSolver(int rowCount, int colCount, List<Classifier> rows, List<Classifier> columns) {
             _colCount = colCount;
             _rowCount = rowCount;
             _cellCount = _rowCount * _colCount;
@@ -75,12 +75,11 @@ namespace Domain {
             SetupSelectionAndFields(selection);
 
             foreach (var item in _items) {
-                var itemNumber = item.Key;
-                var itemClassifier = item.Value;
+                var itemNumber = item.Index;
 
-                foreach (var colorClassKvp in itemClassifier.Colors) {
-                    var myColor = colorClassKvp.Key;
-                    var colorClassifier = colorClassKvp.Value;
+                foreach (var colorClassifierTemp in item.Colors) {
+                    var colorClassifier = colorClassifierTemp;
+                    var myColor = colorClassifier.MyColor;
 
                     if (colorClassifier.Count == 0 || colorClassifier.IsDone || colorClassifier.Count == FindNumberOfElementsInSelection(itemNumber, myColor))
                         colorClassifier.IsDone = true;
@@ -90,7 +89,7 @@ namespace Domain {
                         colorClassifier.IsDone = true;
                         continue;
                     }
-                    var others = itemClassifier.Colors.Values.Where(cc => cc.MyColor != colorClassifier.MyColor);
+                    var others = item.Colors.Where(cc => cc.MyColor != colorClassifier.MyColor);
                     if (others.All(cc => cc.IsDone)) {
                         FillSelection(itemNumber, myColor);
                         colorClassifier.IsDone = true;
@@ -133,19 +132,19 @@ namespace Domain {
                     }
                     if (!colorClassifier.IsConnected) {
                         //todo: kan eg få til denne men med ferdig utfylte plasser?
-                        var count = itemClassifier.Colors.Count(cc => cc.Value.Count > 0);
+                        var count = item.Colors.Count(cc => cc.Count > 0);
                         if (count == 2) {
-                            var other = itemClassifier.Colors.First(cc => !cc.Key.Equals(myColor));
-                            if (other.Value.IsConnected) {
+                            var other = item.Colors.First(cc => !cc.MyColor.Equals(myColor));
+                            if (other.IsConnected) {
                                 FillCells(itemNumber, myColor, new List<int> { 0, _selectionCount - 1 });
                                 //continue;
                             }
                         }
                     }
 
-                    var possibleSpots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0)).ToDictionary();
+                    var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0)).ToList();
                     if (possibleSpots.Count == colorClassifier.Count) {
-                        FillCells(itemNumber, myColor, possibleSpots.Keys.ToList());
+                        FillCells(itemNumber, myColor, possibleSpots.Select(c => c.Index).ToList());
                         colorClassifier.IsDone = true;
                         continue;
                     } else {
@@ -191,10 +190,10 @@ namespace Domain {
                                     FillCells(itemNumber, myColor, new List<int> { first, first + 2 });
                                 }
                             } else {
-                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Key >= firstIndex - 1 && kvp.Key <= firstIndex + 1)).ToDictionary();
-                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && cc.Value.IsDone != true)).ToDictionary();
+                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
+                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0 && cc.IsDone != true)).ToList();
                                 if (newPossibleSpots.Count == colorClassifier.Count - 1) {
-                                    FillCells(itemNumber, myColor, newPossibleSpots.Keys.ToList());
+                                    FillCells(itemNumber, myColor, newPossibleSpots.Select(c => c.Index).ToList());
                                     colorClassifier.IsDone = true;
                                     continue;
                                 }
@@ -204,8 +203,8 @@ namespace Domain {
                         }
                     }
 
-                    var possible2Spots = _oppositeItems.Where(o => o.Value.Colors.Any(cc => cc.Key == myColor && cc.Value.Count > 0 && !cc.Value.IsDone)).ToDictionary();
-                    var possible2Keys = possible2Spots.Select(kvp => kvp.Key).ToList();
+                    var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0 && !cc.IsDone)).ToList();
+                    var possible2Keys = possible2Spots.Select(kvp => kvp.Index).ToList();
                     //note: possibleSpots2 includes the ones that are colored in..
                     Color[] workingArray2 = _getArray(itemNumber);
                     possible2Keys.RemoveAll(i => !workingArray2[i].Equals(Color.Empty));

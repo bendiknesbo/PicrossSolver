@@ -5,9 +5,11 @@ using System.Linq;
 
 namespace Domain {
     public class Classifier {
-        public Dictionary<Color, ColorClassifier> Colors = new Dictionary<Color, ColorClassifier>();
+        public int Index;
+        public List<ColorClassifier> Colors = new List<ColorClassifier>();
 
-        public Classifier(List<Color> usedColors, Color[] row) {
+        public Classifier(int index, List<Color> usedColors, Color[] row) {
+            Index = index;
             var colorRow = new Color[row.Length];
             for (int i = 0; i < row.Length; i++) {
                 colorRow[i] = row[i];
@@ -17,7 +19,7 @@ namespace Domain {
                 var firstIndex = Array.IndexOf(colorRow, color);
                 var lastIndex = Array.LastIndexOf(colorRow, color);
                 var isConnected = (lastIndex - firstIndex + 1) - count == 0;
-                Colors.Add(color, new ColorClassifier { Count = count, MyColor = color, IsConnected = isConnected });
+                Colors.Add(new ColorClassifier { Count = count, MyColor = color, IsConnected = isConnected });
             }
         }
     }
