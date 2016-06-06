@@ -21,9 +21,10 @@ namespace Domain {
         private Classifier _currentItem;
         private Selection _selection;
         private Func<int, int, Color> _getCell;
-        private string _readableString;
         private List<Classifier> _oppositeItems;
         private ColorClassifier _currentColor;
+        private string _readableString;
+        private int _iterationCounter;
         public const int OutOfBoundsConst = -1;
 
         public PicrossSolver(int rowCount, int colCount, List<Classifier> rows, List<Classifier> columns) {
@@ -33,6 +34,7 @@ namespace Domain {
             Columns = columns;
             Rows = rows;
             WorkingGrid = new Color[rowCount, colCount];
+            _iterationCounter = 0;
         }
 
         public void Solve() {
@@ -50,6 +52,7 @@ namespace Domain {
             _readableString = WorkingGrid.ToReadableString();
 #endif
             do {
+                _iterationCounter++;
                 _isDirty = false;
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
