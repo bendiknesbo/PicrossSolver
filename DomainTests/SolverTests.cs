@@ -79,35 +79,77 @@ namespace DomainTests {
         }
 
         [TestMethod]
-        public void Easy_Gallery1() {
-            _levels = LevelFactory.EasyGallery1_Img();
+        public void Easy_Gallery_All() {
+            _levels = LevelFactory.EasyGallery_All();
+            Assert.AreEqual(80, _levels.Count);
             Run();
+        }
+
+        [TestMethod]
+        public void Easy_Gallery1() {
+            _levels = LevelFactory.EasyGallery1();
             Assert.AreEqual(20, _levels.Count);
+            Run();
         }
 
         [TestMethod]
         public void Easy_Gallery2() {
-            _levels = LevelFactory.EasyGallery2_Img();
-            Run();
+            _levels = LevelFactory.EasyGallery2();
             Assert.AreEqual(20, _levels.Count);
+            Run();
         }
 
         [TestMethod]
         public void Easy_Gallery3() {
-            _levels = LevelFactory.EasyGallery3_Img();
-            Run();
+            _levels = LevelFactory.EasyGallery3();
             Assert.AreEqual(20, _levels.Count);
+            Run();
         }
 
         [TestMethod]
         public void Easy_Gallery4() {
-            _levels = LevelFactory.EasyGallery4_Img();
-            Run();
+            _levels = LevelFactory.EasyGallery4();
             Assert.AreEqual(20, _levels.Count);
+            Run();
         }
 
         [TestMethod]
-        public void Easy_All() {
+        public void Medium_Gallery_All() {
+            _levels = LevelFactory.MediumGallery_All();
+            Assert.AreEqual(80, _levels.Count);
+            Run();
+        }
+
+        [TestMethod]
+        public void Medium_Gallery1() {
+            _levels = LevelFactory.MediumGallery1();
+            Assert.AreEqual(20, _levels.Count);
+            Run();
+        }
+
+        [TestMethod]
+        public void Medium_Gallery2() {
+            _levels = LevelFactory.MediumGallery2();
+            Assert.AreEqual(20, _levels.Count);
+            Run();
+        }
+
+        [TestMethod]
+        public void Medium_Gallery3() {
+            _levels = LevelFactory.MediumGallery3();
+            Assert.AreEqual(20, _levels.Count);
+            Run();
+        }
+
+        [TestMethod]
+        public void Medium_Gallery4() {
+            _levels = LevelFactory.MediumGallery4();
+            Assert.AreEqual(20, _levels.Count);
+            Run();
+        }
+
+        [TestMethod]
+        public void All() {
             _levels = LevelFactory.GetAll();
             Run();
             Assert.AreEqual(-1, _levels.Count);
