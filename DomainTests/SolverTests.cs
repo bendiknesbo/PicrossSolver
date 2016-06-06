@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Drawing;
+using System.IO;
 using System.Linq;
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -35,10 +35,10 @@ namespace DomainTests {
                 } catch (Exception ex) {
                     if (ex.Message.Contains("Invalid color!")) {
                         inconclusiveLevels.Add(levelName);
-                        AppendLog(inconclusiveSb, ex, step, levelName);
+                        AppendLog(inconclusiveSb, ex, step, level);
                     } else {
                         errorLevels.Add(levelName);
-                        AppendLog(errorSb, ex, step, levelName);
+                        AppendLog(errorSb, ex, step, level);
                     }
                 }
             }
@@ -61,10 +61,12 @@ namespace DomainTests {
             }
         }
 
-        private void AppendLog(StringBuilder sb, Exception ex, Step step, string levelName) {
+        private void AppendLog(StringBuilder sb, Exception ex, Step step, KeyValuePair<string, string> level) {
             sb.AppendLine();
             sb.AppendLine(string.Format("Failed during step: **{0}**", step));
-            sb.AppendLine(string.Format("Failed during level: **{0}**", levelName));
+            sb.AppendLine(string.Format("Failed during level: **{0}**", level.Key));
+            var pathArray = level.Value.Split(new[] { @"\" }, StringSplitOptions.None);
+            sb.AppendLine(string.Format(@"Specific level:      **LevelImages\{0}\{1}**", pathArray[pathArray.Length - 2], pathArray.Last()));
             if (step == Step.Assert) {
                 sb.AppendLine(string.Format("Expected:{0}{1}", Environment.NewLine, Grid.AnswerGrid.ToReadableString()));
                 sb.AppendLine(string.Format("Actual:   {0}{1}", Environment.NewLine, Solver.WorkingGrid.ToReadableString()));

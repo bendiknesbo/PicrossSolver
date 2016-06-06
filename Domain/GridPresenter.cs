@@ -32,7 +32,7 @@ namespace Domain {
         }
 
         public void LoadDemoData() {
-            var demoPath = string.Empty;
+            string demoPath;
             switch (_demoSelection) {
                 case 0:
                     demoPath = @"LevelImages\EasyGallery2\Small01.png";
