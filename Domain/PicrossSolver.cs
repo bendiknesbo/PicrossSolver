@@ -191,18 +191,17 @@ namespace Domain {
                                 var cellAfter = _getCell(_currentItem.Index, lastIndex + 1); //må cache dette resultatet, da den neste FillSelection kan endre den!
                                 if (cellBefore.Equals(Color.Empty)) {
                                     //hmm...
-                                } else if (cellBefore == myColor) {
-                                    Console.WriteLine("Wat??? breakpoint her...");
-                                } else {
+                                } else if (cellBefore != myColor) {
                                     FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                                } else {
+                                    throw new Exception("Wat, this should never happen!");
                                 }
-
                                 if (cellAfter.Equals(Color.Empty)) {
                                     //hmm...
-                                } else if (cellAfter == myColor) {
-                                    Console.WriteLine("Wat??? breakpoint her...");
-                                } else {
+                                } else if (cellAfter != myColor) {
                                     FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: lastIndex);
+                                } else {
+                                    throw new Exception("Wat??? breakpoint her...");
                                 }
                             }
                         } else if (!_currentColor.IsConnected && _currentColor.Count == 2) {
