@@ -105,9 +105,10 @@ namespace Domain {
                 foreach (var colorClassifierTemp in _currentItem.Colors) {
                     _currentColor = colorClassifierTemp;
                     var myColor = _currentColor.MyColor;
-
-                    if (_currentColor.Count == 0 || _currentColor.IsDone || _currentColor.Count == FindNumberOfElementsInSelection())
+                    if (!_currentColor.IsDone && (_currentColor.Count == 0 || _currentColor.Count == FindNumberOfElementsInSelection())) {
                         _currentColor.IsDone = true;
+                        _isDirty = true;
+                    }
                     if (_currentColor.IsDone) continue;
                     if (_currentColor.Count == _selectionCount) {
                         FillSelection(0, _selectionCount);
