@@ -8,15 +8,15 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests {
     [TestClass]
-    public class SolverTests : SolverTestsBase {
+    public class ImageSolverTests : SolverTestsBase {
         protected override void GridInit() {
             Grid.InitFromImg(InitString);
         }
 
-        private Dictionary<string, string> _levels;
+        protected Dictionary<string, string> _levels;
         private const string HorizontalSplitter = "******************************************";
 
-        private void Run(bool doubleSolve = false) {
+        protected void Run(bool doubleSolve = false) {
             var errorSb = new StringBuilder();
             var errorLevels = new List<string>();
             var inconclusiveLevels = new List<string>();
@@ -79,85 +79,14 @@ namespace DomainTests {
         }
 
         [TestMethod]
-        public void Easy_Gallery_All() {
-            _levels = LevelFactory.EasyGallery_All();
-            Assert.AreEqual(80, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery1() {
-            _levels = LevelFactory.EasyGallery1();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery2() {
-            _levels = LevelFactory.EasyGallery2();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery3() {
-            _levels = LevelFactory.EasyGallery3();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Easy_Gallery4() {
-            _levels = LevelFactory.EasyGallery4();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Medium_Gallery_All() {
-            _levels = LevelFactory.MediumGallery_All();
-            Assert.AreEqual(80, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Medium_Gallery1() {
-            _levels = LevelFactory.MediumGallery1();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Medium_Gallery2() {
-            _levels = LevelFactory.MediumGallery2();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Medium_Gallery3() {
-            _levels = LevelFactory.MediumGallery3();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
-        public void Medium_Gallery4() {
-            _levels = LevelFactory.MediumGallery4();
-            Assert.AreEqual(20, _levels.Count);
-            Run();
-        }
-
-        [TestMethod]
         public void All() {
             _levels = LevelFactory.GetAll();
             Run();
-            Assert.AreEqual(-1, _levels.Count);
         }
 
         [TestMethod]
         public void SelectiveTest() {
-            _levels = LevelFactory.GetAll().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
+            _levels = LevelFactory.GetAll_Levels().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
             Assert.AreEqual(1, _levels.Count);
             Run(doubleSolve: true);
         }
