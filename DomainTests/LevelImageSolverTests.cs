@@ -6,8 +6,8 @@ namespace DomainTests {
     [TestClass]
     public class LevelImageSolverTests : ImageSolverTests {
         [TestMethod]
-        public void SelectiveTest() {
-            _levels = LevelFactory.GetAll_Levels().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
+        public void SpecificLevelTest() {
+            _levels = LevelFactory.Get_Specific();
             Assert.AreEqual(1, _levels.Count);
             Run(doubleSolve: true);
         }

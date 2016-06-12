@@ -25,6 +25,13 @@ namespace Domain {
             }
         }
 
+        public static Dictionary<string, string> Get_Specific() {
+            var dict = new Dictionary<string, string>();
+            var fileInfo = new FileInfo(Properties.SpecificLevel);
+            dict.AddFileFromFolder(fileInfo);
+            return dict;
+        }
+
         public static Dictionary<string, string> EasyGallery_All() {
             return EasyGallery1().Union(EasyGallery2()).Union(EasyGallery3()).Union(EasyGallery4()).ToDictionary();
         }

@@ -13,12 +13,19 @@ namespace Domain {
             folderPath = folderPath.Split(new[] { @"\" }, StringSplitOptions.RemoveEmptyEntries).Last();
             var folderPrefix = folderPath.SplitCamelCase();
             foreach (var fileInfo in dirInfo.EnumerateFiles()) {
-                if (!fileInfo.Extension.Contains(".png")) continue;
-                var filePrefix = fileInfo.Name.SplitCamelCase();
-                newDict.Add(folderPrefix + ": " + filePrefix, fileInfo.FullName);
-
+                newDict.AddFileFromFolder(fileInfo, folderPrefix);
             }
             return newDict;
+        }
+
+        public static void AddFileFromFolder(this Dictionary<string, string> dict, FileInfo fileInfo, string folderPrefix = null) {
+            if (!fileInfo.Extension.Contains(".png")) return;
+            if (folderPrefix == null) {
+                var folderPath = fileInfo.Directory.FullName.Split(new[] { @"\" }, StringSplitOptions.RemoveEmptyEntries).Last();
+                folderPrefix = folderPath.SplitCamelCase();
+            }
+            var filePrefix = fileInfo.Name.SplitCamelCase();
+            dict.Add(folderPrefix + ": " + filePrefix, fileInfo.FullName);
         }
         private static string SplitCamelCase(this string s) {
             Regex upperCaseRegex = new Regex(@"[A-Z][a-z]*|\d+");
@@ -42,7 +49,7 @@ namespace Domain {
             return newDict;
         }
 
-        public static Dictionary<T1, T2> ToDictionary<T1,T2>(this IEnumerable<KeyValuePair<T1, T2>> enumerableDict) {
+        public static Dictionary<T1, T2> ToDictionary<T1, T2>(this IEnumerable<KeyValuePair<T1, T2>> enumerableDict) {
             return enumerableDict.ToDictionary(k => k.Key, v => v.Value);
         }
     }

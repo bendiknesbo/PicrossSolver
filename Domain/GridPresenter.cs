@@ -54,7 +54,7 @@ namespace Domain {
             LoadData(demoPath);
         }
         public void LoadSpecificData() {
-            var specificPath = @"LevelImages\EasyGallery2\Large07.png";
+            var specificPath = LevelFactory.Get_Specific().First().Value;
             LoadData(specificPath, doubleSolve: true);
         }
 
