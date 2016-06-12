@@ -111,47 +111,18 @@ namespace Domain.Picross {
                         continue;
                     if (SolvePart(Solve_WholeRowOrColumnIsSameColor))
                         continue;
-
                     if (SolvePart(Solve_OnlyThisColorLeftInItem))
                         continue;
-
-
-                    if (_currentColor.IsConnected) {
-                        Color[] workingArray = _getArray(_currentItem.Index);
-                        var firstIndex = IndexOf(workingArray, myColor);
-                        var lastIndex = LastIndexOf(workingArray, myColor);
-                        if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
-                            //do nothing
-                        } else if (firstIndex == 0) {
-                            //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
-                            FillSelection(startIndex: firstIndex, endIndex: _currentColor.Count);
-                            _currentColor.IsDone = true;
-                            continue;
-                        } else if (lastIndex == _selectionCount) {
-                            //Eksempel: 0,0,0,0,2 + Count=3 -> 0,0,2,2,2
-                            FillSelection(startIndex: lastIndex - _currentColor.Count, endIndex: lastIndex);
-                            _currentColor.IsDone = true;
-                            continue;
-                        } else {
-                            if (0 + _currentColor.Count > firstIndex) {
-                                int extraToTheLeft = 0;
-                                var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
-                                if (workingDict.Any(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty))) {
-                                    extraToTheLeft = workingDict.First(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty)).Key;
-                                }
-                                //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
-                                FillSelection(startIndex: firstIndex, endIndex: extraToTheLeft + _currentColor.Count);
-                            }
-                            if (_selectionCount - _currentColor.Count < lastIndex) {
-                                //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
-                                FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: lastIndex);
-                            }
-                            //Eksempel: 0,2,0,2,0 + Count=4 -> 0,2,2,2,0
-                            FillSelection(startIndex: firstIndex, endIndex: lastIndex);
-                            //continue?
-                        }
-                    }
-
+                    if (SolvePart(Solve_FillConnectedFromStart))
+                        continue;
+                    if (SolvePart(Solve_FillConnectedFromEnd))
+                        continue;
+                    if (SolvePart(Solve_PartiallyFillConnectedFromStart))
+                        continue;
+                    if (SolvePart(Solve_PartiallyFillConnectedFromEnd))
+                        continue;
+                    if (SolvePart(Solve_FillBetweenConnected))
+                        continue;
                     if (SolvePart(Solve_OnlyTwoColorsInItem_OtherColorIsConnected))
                         continue;
 
@@ -200,7 +171,7 @@ namespace Domain.Picross {
                                 var temp = workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).ToDictionary();
                                 var first = temp.First().Key;
                                 if (temp.Count() == 3 && temp.ContainsKey(first + 1) && temp.ContainsKey(first + 2)) {
-                                    FillCells(new List<int> { first, first + 2 });
+                                    FillCells(new List<int>{ first, first + 2 });
                                 }
                             } else {
                                 var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
@@ -283,6 +254,7 @@ namespace Domain.Picross {
                 _currentColor.IsDone = true;
             }
         }
+
         private void Solve_OnlyThisColorLeftInItem() {
             var others = _currentItem.Colors.Where(cc => cc.MyColor != _currentColor.MyColor);
             if (others.All(cc => cc.IsDone)) {
@@ -292,6 +264,76 @@ namespace Domain.Picross {
                 _currentColor.IsDone = true;
             }
         }
+
+        private void Solve_FillConnectedFromStart() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex == 0) {
+                //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
+                FillSelection(startIndex: firstIndex, endIndex: _currentColor.Count);
+                _currentColor.IsDone = true;
+            }
+        }
+
+        private void Solve_FillConnectedFromEnd() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+            if (lastIndex == _selectionCount) {
+                //Eksempel: 0,0,0,0,2 + Count=3 -> 0,0,2,2,2
+                FillSelection(startIndex: lastIndex - _currentColor.Count, endIndex: lastIndex);
+                _currentColor.IsDone = true;
+            }
+        }
+
+        private void Solve_FillBetweenConnected() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex > OutOfBoundsConst && lastIndex > firstIndex) {
+                //Eksempel: 0,2,0,2,0 + Count=4 -> 0,2,2,2,0
+                FillSelection(startIndex: firstIndex, endIndex: lastIndex);
+            }
+        }
+
+        private void Solve_PartiallyFillConnectedFromStart() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex > OutOfBoundsConst) {
+                if (0 + _currentColor.Count > firstIndex) {
+                    int extraToTheLeft = 0;
+                    var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                    if (workingDict.Any(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty))) {
+                        extraToTheLeft = workingDict.First(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty)).Key;
+                    }
+                    //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
+                    FillSelection(startIndex: firstIndex, endIndex: extraToTheLeft + _currentColor.Count);
+                }
+            }
+        }
+        private void Solve_PartiallyFillConnectedFromEnd() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex > OutOfBoundsConst) {
+                if (_selectionCount - _currentColor.Count < lastIndex) {
+                    //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
+                    FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: lastIndex);
+                }
+
+            }
+        }
+
         private void Solve_OnlyTwoColorsInItem_OtherColorIsConnected() {
             if (_currentColor.IsConnected)
                 return;
@@ -300,10 +342,11 @@ namespace Domain.Picross {
             if (count == 2) {
                 var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
-                    FillCells(new List<int> { 0, _selectionCount - 1 });
+                    FillCells(new List<int>{ 0, _selectionCount - 1 });
                 }
             }
         }
+
         private void Solve_OnlyOnePossibleBlockSetWhereConnectedFits() {
             if (!_currentColor.IsConnected)
                 return;
@@ -444,7 +487,6 @@ namespace Domain.Picross {
                 WorkingGrid[row, column] = color;
                 _paintedCount++;
                 _isDirty = true;
-
             }
 #if DEBUG
             _readableString = WorkingGrid.ToReadableString();
