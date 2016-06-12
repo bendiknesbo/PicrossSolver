@@ -48,6 +48,7 @@ namespace Domain.Picross {
                 Solve_Part_FillConnectedFromEnd,
                 Solve_Part_PartiallyFillConnectedFromStart,
                 Solve_Part_PartiallyFillConnectedFromEnd,
+                Solve_Part_PartiallyFillConnectedWithMoreThanHalf,
                 Solve_Part_FillBetweenConnected,
                 Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected,
                 Solve_Part_Temp1,
@@ -116,7 +117,7 @@ namespace Domain.Picross {
             }
         }
 
-        //Before refactor: Number of failing tests: 42
+        //Before refactor: Number of failing tests: 38
         //Before refactor: Number of failing tests: 300
         private void Iterate(Selection selection) {
             SetupSelectionAndFields(selection);
@@ -126,7 +127,6 @@ namespace Domain.Picross {
 
                 foreach (var colorClassifierTemp in _currentItem.Colors) {
                     _currentColor = colorClassifierTemp;
-                    var myColor = _currentColor.MyColor;
                     foreach (var action in SolvePartActions) {
                         if (SolvePart(action))
                             break;
@@ -231,6 +231,15 @@ namespace Domain.Picross {
                     FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: lastIndex);
                 }
 
+            }
+        }
+        private void Solve_Part_PartiallyFillConnectedWithMoreThanHalf() {
+            if (!_currentColor.IsConnected)
+                return;
+            //TODO: Allow padding from both sides.
+            int half = _selectionCount / 2;
+            if (_currentColor.Count > half) {
+                FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: _currentColor.Count);
             }
         }
 
