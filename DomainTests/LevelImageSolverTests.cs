@@ -1,9 +1,16 @@
+using System.Linq;
 using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests {
     [TestClass]
     public class LevelImageSolverTests : ImageSolverTests {
+        [TestMethod]
+        public void SelectiveTest() {
+            _levels = LevelFactory.GetAll_Levels().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
+            Assert.AreEqual(1, _levels.Count);
+            Run(doubleSolve: true);
+        }
         [TestMethod]
         public void All_Levels() {
             _levels = LevelFactory.GetAll_Levels();

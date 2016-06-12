@@ -5,12 +5,6 @@ using System.Linq;
 
 namespace Domain {
     public static class LevelFactory {
-        public static Dictionary<string, string> GetAll() {
-            var dict = new Dictionary<string, string>();
-            FillDictRecursive(Environment.CurrentDirectory, dict);
-            return dict;
-        }
-
         public static Dictionary<string, string> GetAll_Levels() {
             var dict = new Dictionary<string, string>();
             FillDictRecursive(Environment.CurrentDirectory + @"\LevelImages", dict);

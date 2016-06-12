@@ -7,7 +7,6 @@ using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests {
-    [TestClass]
     public class ImageSolverTests : SolverTestsBase {
         protected override void GridInit() {
             Grid.InitFromImg(InitString);
@@ -76,19 +75,6 @@ namespace DomainTests {
             sb.AppendLine(string.Format("Exception: {0}", ex));
             sb.AppendLine();
             sb.AppendLine(HorizontalSplitter);
-        }
-
-        [TestMethod]
-        public void All() {
-            _levels = LevelFactory.GetAll();
-            Run();
-        }
-
-        [TestMethod]
-        public void SelectiveTest() {
-            _levels = LevelFactory.GetAll_Levels().Where(kvp => kvp.Key.Contains("Easy Gallery 1: Medium 01")).ToDictionary();
-            Assert.AreEqual(1, _levels.Count);
-            Run(doubleSolve: true);
         }
     }
 }

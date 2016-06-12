@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq;
+using Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests {
