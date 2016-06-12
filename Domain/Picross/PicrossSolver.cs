@@ -107,11 +107,8 @@ namespace Domain.Picross {
                 foreach (var colorClassifierTemp in _currentItem.Colors) {
                     _currentColor = colorClassifierTemp;
                     var myColor = _currentColor.MyColor;
-                    if (!_currentColor.IsDone && (_currentColor.Count == 0 || _currentColor.Count == FindNumberOfElementsInSelection())) {
-                        _currentColor.IsDone = true;
-                        _isDirty = true;
-                    }
-                    if (_currentColor.IsDone) continue;
+                    if (SolvePart(Solve_WasAlreadySolved))
+                        continue;
                     if (SolvePart(Solve_WholeRowOrColumnIsSameColor))
                         continue;
 
@@ -269,6 +266,15 @@ namespace Domain.Picross {
         private bool SolvePart(Action part) {
             part();
             return _currentColor.IsDone;
+        }
+
+        private void Solve_WasAlreadySolved() {
+            if (_currentColor.IsDone)
+                return;
+            if (_currentColor.Count == 0 || _currentColor.Count == FindNumberOfElementsInSelection()) {
+                _currentColor.IsDone = true;
+                _isDirty = true;
+            }
         }
 
         private void Solve_WholeRowOrColumnIsSameColor() {
