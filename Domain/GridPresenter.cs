@@ -4,6 +4,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Domain.Helpers;
+using Domain.Picross;
 using MColor = System.Windows.Media.Color;
 using DColor = System.Drawing.Color;
 
@@ -54,7 +56,7 @@ namespace Domain {
             LoadData(demoPath);
         }
         public void LoadSpecificData() {
-            var specificPath = LevelFactory.Get_Specific().First().Value;
+            var specificPath = LevelFactory.Get_Specific().First().Initializer;
             LoadData(specificPath, doubleSolve: true);
         }
 

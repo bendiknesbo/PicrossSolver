@@ -1,6 +1,6 @@
 using System.Drawing;
 
-namespace Domain {
+namespace Domain.Picross {
     public class ColorClassifier {
         public Color MyColor { get; set; }
         public int Count { get; set; }

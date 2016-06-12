@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using Domain.Annotations;
 
-namespace Domain {
+namespace Domain.Helpers {
     public abstract class Notifiable : INotifyPropertyChanged {
         public virtual event PropertyChangedEventHandler PropertyChanged;
 

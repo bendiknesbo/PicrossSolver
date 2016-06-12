@@ -1,13 +1,12 @@
-﻿using System.Linq;
-using Domain;
+﻿using Domain.Picross;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DomainTests {
+namespace DomainTests.SolverTests {
     [TestClass]
     public class TestImageSolverTests : ImageSolverTests {
         [TestMethod]
         public void All_Test() {
-            _levels = LevelFactory.GetAll_Test();
+            Levels = LevelFactory.GetAll_Test();
             Run();
         }
     }

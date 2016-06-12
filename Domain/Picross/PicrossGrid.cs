@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
+using Domain.Helpers;
 
-namespace Domain {
+namespace Domain.Picross {
     public class PicrossGrid {
         public int ColumnCount;
         public int RowCount;

@@ -50,23 +50,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="CellUc.xaml.cs">
+    <Compile Include="Cell\CellUc.xaml.cs">
       <DependentUpon>CellUc.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ColumnClassifierUc.xaml.cs">
+    <Compile Include="Column\ColumnClassifierUc.xaml.cs">
       <DependentUpon>ColumnClassifierUc.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RowClassifierUc.xaml.cs">
+    <Compile Include="Row\RowClassifierUc.xaml.cs">
       <DependentUpon>RowClassifierUc.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RowUc.xaml.cs">
+    <Compile Include="Row\RowUc.xaml.cs">
       <DependentUpon>RowUc.xaml</DependentUpon>
     </Compile>
-    <Page Include="CellUc.xaml">
+    <Page Include="Cell\CellUc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ColumnClassifierUc.xaml">
+    <Page Include="Column\ColumnClassifierUc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -82,11 +82,11 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="RowClassifierUc.xaml">
+    <Page Include="Row\RowClassifierUc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="RowUc.xaml">
+    <Page Include="Row\RowUc.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -1,13 +1,14 @@
-﻿<UserControl x:Class="PicrossSolver.RowClassifierUc"
+﻿<UserControl x:Class="PicrossSolver.Row.RowUc"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:domain="clr-namespace:Domain;assembly=Domain"
              xmlns:picrossSolver="clr-namespace:PicrossSolver"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:ClassifierPresenter}"
-             d:DesignHeight="30" d:DesignWidth="120" >
-    <ListBox ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+             xmlns:cell="clr-namespace:PicrossSolver.Cell"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:RowPresenter}"
+             d:DesignHeight="30" d:DesignWidth="300" >
+    <ListBox ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
                 <WrapPanel Orientation="Horizontal" />
@@ -15,7 +16,7 @@
         </ItemsControl.ItemsPanel>
         <ListBox.ItemTemplate>
             <DataTemplate DataType="{x:Type domain:CellPresenter}">
-                <picrossSolver:CellUc />
+                <cell:CellUc />
             </DataTemplate>
         </ListBox.ItemTemplate>
     </ListBox>

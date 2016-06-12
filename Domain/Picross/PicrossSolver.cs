@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Domain.Enums;
+using Domain.Helpers;
 
-namespace Domain {
+namespace Domain.Picross {
     public class PicrossSolver {
         public List<Classifier> Rows { get; private set; }
         public List<Classifier> Columns { get; private set; }

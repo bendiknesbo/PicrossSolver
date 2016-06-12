@@ -4,9 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 
-namespace Domain {
+namespace Domain.Helpers {
     public static class GridHelpers {
         static GridHelpers() {
             ResetCache();

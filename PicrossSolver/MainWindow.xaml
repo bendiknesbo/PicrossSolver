@@ -4,14 +4,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:domain="clr-namespace:Domain;assembly=Domain"
-        xmlns:picrossSolver="clr-namespace:PicrossSolver"
+        xmlns:picross="clr-namespace:Domain.Picross;assembly=Domain"
+        xmlns:row="clr-namespace:PicrossSolver.Row"
+        xmlns:column="clr-namespace:PicrossSolver.Column"
         Title="MainWindow" Height="800" Width="600"
         mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:GridPresenter}">
     <DockPanel LastChildFill="True">
         <UniformGrid x:Name="FunctionsGrid" DockPanel.Dock="Top" Columns="3">
-            <Button Grid.Column="0"  Content="Load demo" Click="LoadDemo_OnClick" />
-            <Button Grid.Column="1"  Content="Load specific" Click="LoadSpecific_OnClick" />
-            <Button Grid.Column="1"  Content="Show all classifiers" Click="ShowAllClassifiers_OnClick" />
+            <Button Content="Load demo" Click="LoadDemo_OnClick" />
+            <Button Content="Load specific" Click="LoadSpecific_OnClick" />
+            <Button Content="Show all classifiers" Click="ShowAllClassifiers_OnClick" />
         </UniformGrid>
         <Grid DockPanel.Dock="Bottom">
             <Grid.RowDefinitions>
@@ -29,22 +31,22 @@
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type domain:Classifier}">
-                        <picrossSolver:ColumnClassifierUc />
+                    <DataTemplate DataType="{x:Type picross:Classifier}">
+                        <column:ColumnClassifierUc />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
             <ListBox x:Name="RowClassifiers" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding RowClassifiers}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
                 <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type domain:Classifier}">
-                        <picrossSolver:RowClassifierUc />
+                    <DataTemplate DataType="{x:Type picross:Classifier}">
+                        <row:RowClassifierUc />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
             <ListBox x:Name="MainGrid" Grid.Row="1" Grid.Column="1"  ItemsSource="{Binding Rows}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type domain:RowPresenter}">
-                        <picrossSolver:RowUc />
+                        <row:RowUc />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>

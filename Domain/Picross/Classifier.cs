@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace Domain {
+namespace Domain.Picross {
     public class Classifier {
         public int Index;
         public List<ColorClassifier> Colors = new List<ColorClassifier>();

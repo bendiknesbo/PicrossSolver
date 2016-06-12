@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
-using Domain;
+using Domain.Picross;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-//using Color = Domain.Color;
 
-namespace DomainTests {
+namespace DomainTests.GridTests {
     [TestClass]
     public class GridTests {
         [TestMethod]
