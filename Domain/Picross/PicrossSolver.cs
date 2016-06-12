@@ -29,6 +29,8 @@ namespace Domain.Picross {
         private int _iterationCounter;
         public const int OutOfBoundsConst = -1;
 
+        public List<Action> SolvePartActions;
+
         public PicrossSolver(int rowCount, int colCount, List<Classifier> rows, List<Classifier> columns) {
             _colCount = colCount;
             _rowCount = rowCount;
@@ -37,6 +39,19 @@ namespace Domain.Picross {
             Rows = rows;
             WorkingGrid = new Color[rowCount, colCount];
             _iterationCounter = 0;
+            //All Actions in this list should start with "Solve_Part_"
+            SolvePartActions = new List<Action>{
+                Solve_Part_WasAlreadySolved,
+                Solve_Part_WholeRowOrColumnIsSameColor,
+                Solve_Part_OnlyThisColorLeftInItem,
+                Solve_Part_FillConnectedFromStart,
+                Solve_Part_FillConnectedFromEnd,
+                Solve_Part_PartiallyFillConnectedFromStart,
+                Solve_Part_PartiallyFillConnectedFromEnd,
+                Solve_Part_FillBetweenConnected,
+                Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected,
+                Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits
+            };
         }
 
         public void Solve() {
@@ -98,6 +113,8 @@ namespace Domain.Picross {
             }
         }
 
+        //Before refactor: Number of failing tests: 42
+        //Before refactor: Number of failing tests: 300
         private void Iterate(Selection selection) {
             SetupSelectionAndFields(selection);
 
@@ -107,23 +124,12 @@ namespace Domain.Picross {
                 foreach (var colorClassifierTemp in _currentItem.Colors) {
                     _currentColor = colorClassifierTemp;
                     var myColor = _currentColor.MyColor;
-                    if (SolvePart(Solve_WasAlreadySolved))
-                        continue;
-                    if (SolvePart(Solve_WholeRowOrColumnIsSameColor))
-                        continue;
-                    if (SolvePart(Solve_OnlyThisColorLeftInItem))
-                        continue;
-                    if (SolvePart(Solve_FillConnectedFromStart))
-                        continue;
-                    if (SolvePart(Solve_FillConnectedFromEnd))
-                        continue;
-                    if (SolvePart(Solve_PartiallyFillConnectedFromStart))
-                        continue;
-                    if (SolvePart(Solve_PartiallyFillConnectedFromEnd))
-                        continue;
-                    if (SolvePart(Solve_FillBetweenConnected))
-                        continue;
-                    if (SolvePart(Solve_OnlyTwoColorsInItem_OtherColorIsConnected))
+                    foreach (var action in SolvePartActions) {
+                        if (SolvePart(action))
+                            break;
+                    }
+                    //Midlertidig continue, fram til alle parts har blitt lagt til i lista. Må ha den pga en av parts er avhengig av at _currentColor ikkje er done... Må fikses...
+                    if(_currentColor.IsDone)
                         continue;
 
 
@@ -171,7 +177,7 @@ namespace Domain.Picross {
                                 var temp = workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).ToDictionary();
                                 var first = temp.First().Key;
                                 if (temp.Count() == 3 && temp.ContainsKey(first + 1) && temp.ContainsKey(first + 2)) {
-                                    FillCells(new List<int>{ first, first + 2 });
+                                    FillCells(new List<int> { first, first + 2 });
                                 }
                             } else {
                                 var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
@@ -228,8 +234,6 @@ namespace Domain.Picross {
                             }
                         }
                     }
-                    if (SolvePart(Solve_OnlyOnePossibleBlockSetWhereConnectedFits))
-                        continue;
                 }
             }
         }
@@ -239,7 +243,7 @@ namespace Domain.Picross {
             return _currentColor.IsDone;
         }
 
-        private void Solve_WasAlreadySolved() {
+        private void Solve_Part_WasAlreadySolved() {
             if (_currentColor.IsDone)
                 return;
             if (_currentColor.Count == 0 || _currentColor.Count == FindNumberOfElementsInSelection()) {
@@ -248,14 +252,14 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_WholeRowOrColumnIsSameColor() {
+        private void Solve_Part_WholeRowOrColumnIsSameColor() {
             if (_currentColor.Count == _selectionCount) {
                 FillSelection(0, _selectionCount);
                 _currentColor.IsDone = true;
             }
         }
 
-        private void Solve_OnlyThisColorLeftInItem() {
+        private void Solve_Part_OnlyThisColorLeftInItem() {
             var others = _currentItem.Colors.Where(cc => cc.MyColor != _currentColor.MyColor);
             if (others.All(cc => cc.IsDone)) {
                 Color[] workingArray = _getArray(_currentItem.Index);
@@ -265,7 +269,7 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_FillConnectedFromStart() {
+        private void Solve_Part_FillConnectedFromStart() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
@@ -277,7 +281,7 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_FillConnectedFromEnd() {
+        private void Solve_Part_FillConnectedFromEnd() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
@@ -289,7 +293,7 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_FillBetweenConnected() {
+        private void Solve_Part_FillBetweenConnected() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
@@ -301,12 +305,11 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_PartiallyFillConnectedFromStart() {
+        private void Solve_Part_PartiallyFillConnectedFromStart() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
             var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
-            var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
             if (firstIndex > OutOfBoundsConst) {
                 if (0 + _currentColor.Count > firstIndex) {
                     int extraToTheLeft = 0;
@@ -319,7 +322,7 @@ namespace Domain.Picross {
                 }
             }
         }
-        private void Solve_PartiallyFillConnectedFromEnd() {
+        private void Solve_Part_PartiallyFillConnectedFromEnd() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
@@ -334,7 +337,7 @@ namespace Domain.Picross {
             }
         }
 
-        private void Solve_OnlyTwoColorsInItem_OtherColorIsConnected() {
+        private void Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected() {
             if (_currentColor.IsConnected)
                 return;
             //todo: kan eg få til denne men med ferdig utfylte plasser?
@@ -342,12 +345,12 @@ namespace Domain.Picross {
             if (count == 2) {
                 var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
-                    FillCells(new List<int>{ 0, _selectionCount - 1 });
+                    FillCells(new List<int> { 0, _selectionCount - 1 });
                 }
             }
         }
 
-        private void Solve_OnlyOnePossibleBlockSetWhereConnectedFits() {
+        private void Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits() {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);

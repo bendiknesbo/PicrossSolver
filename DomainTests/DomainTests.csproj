@@ -59,6 +59,7 @@
     <Compile Include="SolverTests\ManualStringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolverTests\ImageSolverTests.cs" />
+    <Compile Include="SolverTests\SolverMetaTests.cs" />
     <Compile Include="SolverTests\SolverTestsBase.cs" />
     <Compile Include="SolverTests\TestImageSolverTests.cs" />
   </ItemGroup>
