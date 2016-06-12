@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Drawing;
 using Domain.Interfaces;
 using Domain.Level;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -64,6 +65,29 @@ namespace DomainTests.SolverTests {
 ")
             };
             Run();
+        }
+        [TestMethod]
+        public void GridString_Unsolvable_1() {
+            string levelString = @"
+1,2,1,2
+2,1,2,1
+1,2,1,2 
+2,1,2,1
+";
+            Levels = new List<ILevel>{
+                new GridStringLevel("Unsolvable: 1",levelString)
+            };
+            try {
+                Run();
+            } catch (AssertFailedException) {
+                for (int i = 0; i < Grid.RowCount; i++) {
+                    for (int j = 0; j < Grid.ColumnCount; j++) {
+                        Grid.AnswerGrid[i, j] = Color.Empty;
+                    }
+                }
+                AssertMatrix();
+            }
+
         }
     }
 }

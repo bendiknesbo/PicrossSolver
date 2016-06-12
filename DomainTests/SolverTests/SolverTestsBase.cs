@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using Domain.Helpers;
 using Domain.Interfaces;
+using Domain.Level;
 using Domain.Picross;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -83,8 +84,10 @@ namespace DomainTests.SolverTests {
             sb.AppendLine();
             sb.AppendLine(String.Format("Failed during step: **{0}**", step));
             sb.AppendLine(String.Format("Failed during level: **{0}**", level.Identifier));
-            var pathArray = level.Initializer.Split(new[] { @"\" }, StringSplitOptions.None);
-            sb.AppendLine(String.Format(@"Specific level:      **LevelImages\{0}\{1}**", pathArray[pathArray.Length - 2], pathArray.Last()));
+            if (level is ImageLevel) {
+                var pathArray = level.Initializer.Split(new[] { @"\" }, StringSplitOptions.None);
+                sb.AppendLine(String.Format(@"Specific level:      **LevelImages\{0}\{1}**", pathArray[pathArray.Length - 2], pathArray.Last()));
+            }
             if (step == Step.Assert) {
                 sb.AppendLine(String.Format("Expected:{0}{1}", Environment.NewLine, Grid.AnswerGrid.ToReadableString()));
                 sb.AppendLine(String.Format("Actual:   {0}{1}", Environment.NewLine, Solver.WorkingGrid.ToReadableString()));

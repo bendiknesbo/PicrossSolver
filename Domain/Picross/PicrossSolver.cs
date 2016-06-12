@@ -112,19 +112,13 @@ namespace Domain.Picross {
                         _isDirty = true;
                     }
                     if (_currentColor.IsDone) continue;
-                    if (_currentColor.Count == _selectionCount) {
-                        FillSelection(0, _selectionCount);
-                        _currentColor.IsDone = true;
+                    if (SolvePart(Solve_WholeRowOrColumnIsSameColor))
                         continue;
-                    }
-                    var others = _currentItem.Colors.Where(cc => cc.MyColor != _currentColor.MyColor);
-                    if (others.All(cc => cc.IsDone)) {
-                        Color[] workingArray = _getArray(_currentItem.Index);
-                        var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
-                        FillCells(workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).Select(kvp => kvp.Key).ToList());
-                        _currentColor.IsDone = true;
+
+                    if (SolvePart(Solve_OnlyThisColorLeftInItem))
                         continue;
-                    }
+
+
                     if (_currentColor.IsConnected) {
                         Color[] workingArray = _getArray(_currentItem.Index);
                         var firstIndex = IndexOf(workingArray, myColor);
@@ -160,17 +154,10 @@ namespace Domain.Picross {
                             //continue?
                         }
                     }
-                    if (!_currentColor.IsConnected) {
-                        //todo: kan eg få til denne men med ferdig utfylte plasser?
-                        var count = _currentItem.Colors.Count(cc => cc.Count > 0);
-                        if (count == 2) {
-                            var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(myColor));
-                            if (other.IsConnected) {
-                                FillCells(new List<int> { 0, _selectionCount - 1 });
-                                //continue;
-                            }
-                        }
-                    }
+
+                    if (SolvePart(Solve_OnlyTwoColorsInItem_OtherColorIsConnected))
+                        continue;
+
 
                     var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0)).ToList();
                     if (possibleSpots.Count == _currentColor.Count) {
@@ -273,14 +260,47 @@ namespace Domain.Picross {
                             }
                         }
                     }
-                    if (_currentColor.IsConnected) {
-                        Solve_OnlyOnePossibleBlockSetWhereConnectedFits();
-                    }
+                    if (SolvePart(Solve_OnlyOnePossibleBlockSetWhereConnectedFits))
+                        continue;
                 }
             }
         }
 
+        private bool SolvePart(Action part) {
+            part();
+            return _currentColor.IsDone;
+        }
+
+        private void Solve_WholeRowOrColumnIsSameColor() {
+            if (_currentColor.Count == _selectionCount) {
+                FillSelection(0, _selectionCount);
+                _currentColor.IsDone = true;
+            }
+        }
+        private void Solve_OnlyThisColorLeftInItem() {
+            var others = _currentItem.Colors.Where(cc => cc.MyColor != _currentColor.MyColor);
+            if (others.All(cc => cc.IsDone)) {
+                Color[] workingArray = _getArray(_currentItem.Index);
+                var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                FillCells(workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).Select(kvp => kvp.Key).ToList());
+                _currentColor.IsDone = true;
+            }
+        }
+        private void Solve_OnlyTwoColorsInItem_OtherColorIsConnected() {
+            if (_currentColor.IsConnected)
+                return;
+            //todo: kan eg få til denne men med ferdig utfylte plasser?
+            var count = _currentItem.Colors.Count(cc => cc.Count > 0);
+            if (count == 2) {
+                var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
+                if (other.IsConnected) {
+                    FillCells(new List<int> { 0, _selectionCount - 1 });
+                }
+            }
+        }
         private void Solve_OnlyOnePossibleBlockSetWhereConnectedFits() {
+            if (!_currentColor.IsConnected)
+                return;
             Color[] workingArray = _getArray(_currentItem.Index);
             var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
             var intRangeList = FindBlockSetsWhereConnectedFits(workingDict);

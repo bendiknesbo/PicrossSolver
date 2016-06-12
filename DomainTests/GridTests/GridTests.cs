@@ -65,5 +65,19 @@ namespace DomainTests.GridTests {
             Assert.AreEqual(2, grid.Rows.Count);
             Assert.AreEqual(1, grid.Columns.Count);
         }
+
+        [TestMethod]
+        public void IsInitializable_Unsolvable1() {
+            var grid = new PicrossGrid();
+            var temp = @"
+1,2,1,2
+2,1,2,1
+1,2,1,2 
+2,1,2,1
+";
+            grid.InitFromGridString(temp);
+            Assert.AreEqual(4, grid.Rows.Count);
+            Assert.AreEqual(4, grid.Columns.Count);
+        }
     }
 }
