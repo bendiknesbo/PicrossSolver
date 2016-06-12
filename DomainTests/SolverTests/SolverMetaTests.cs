@@ -12,9 +12,6 @@ namespace DomainTests.SolverTests {
         /// </summary>
         [TestMethod]
         public void AllSolvePartsAreCollectedInList() {
-            var level = LevelFactory.EasyGallery1().First();
-            var grid = new PicrossGrid();
-            grid.InitFromImg(level.Initializer);
             var solver = new PicrossSolver(0, 0, new List<Classifier>(), new List<Classifier>());
             var solverType = typeof(PicrossSolver);
             var methods = solverType.GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.Name.StartsWith("Solve_Part_")).ToList();

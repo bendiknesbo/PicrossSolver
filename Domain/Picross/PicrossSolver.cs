@@ -50,7 +50,10 @@ namespace Domain.Picross {
                 Solve_Part_PartiallyFillConnectedFromEnd,
                 Solve_Part_FillBetweenConnected,
                 Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected,
-                Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits
+                Solve_Part_Temp1,
+                Solve_Part_Temp2,
+                Solve_Part_Temp3,
+                Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits,
             };
         }
 
@@ -127,112 +130,6 @@ namespace Domain.Picross {
                     foreach (var action in SolvePartActions) {
                         if (SolvePart(action))
                             break;
-                    }
-                    //Midlertidig continue, fram til alle parts har blitt lagt til i lista. Må ha den pga en av parts er avhengig av at _currentColor ikkje er done... Må fikses...
-                    if(_currentColor.IsDone)
-                        continue;
-
-
-                    var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0)).ToList();
-                    if (possibleSpots.Count == _currentColor.Count) {
-                        FillCells(possibleSpots.Select(c => c.Index).ToList());
-                        _currentColor.IsDone = true;
-                        continue;
-                    } else {
-                        //fleire mulige enn antall som skal til.
-                        if (_currentColor.IsConnected) {
-                            Color[] workingArray = _getArray(_currentItem.Index);
-                            var firstIndex = IndexOf(workingArray, myColor);
-                            var lastIndex = LastIndexOf(workingArray, myColor);
-                            if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
-                                //do nothing
-                            } else if (firstIndex - 1 <= OutOfBoundsConst) {
-                                //
-                            } else if (lastIndex + 1 > _selectionCount - 1) {
-                                //out of bounds
-                            } else {
-                                var cellBefore = _getCell(_currentItem.Index, firstIndex - 1);
-                                var cellAfter = _getCell(_currentItem.Index, lastIndex + 1); //må cache dette resultatet, da den neste FillSelection kan endre den!
-                                if (cellBefore.Equals(Color.Empty)) {
-                                    //hmm...
-                                } else if (cellBefore != myColor) {
-                                    FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
-                                } else {
-                                    throw new Exception("Wat, this should never happen!");
-                                }
-                                if (cellAfter.Equals(Color.Empty)) {
-                                    //hmm...
-                                } else if (cellAfter != myColor) {
-                                    FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: lastIndex);
-                                } else {
-                                    throw new Exception("Wat??? breakpoint her...");
-                                }
-                            }
-                        } else if (!_currentColor.IsConnected && _currentColor.Count == 2) {
-                            //todo: Meir generell??
-                            Color[] workingArray = _getArray(_currentItem.Index);
-                            var firstIndex = IndexOf(workingArray, myColor);
-                            if (firstIndex <= OutOfBoundsConst) {
-                                var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
-                                var temp = workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).ToDictionary();
-                                var first = temp.First().Key;
-                                if (temp.Count() == 3 && temp.ContainsKey(first + 1) && temp.ContainsKey(first + 2)) {
-                                    FillCells(new List<int> { first, first + 2 });
-                                }
-                            } else {
-                                var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
-                                newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0 && cc.IsDone != true)).ToList();
-                                if (newPossibleSpots.Count == _currentColor.Count - 1) {
-                                    FillCells(newPossibleSpots.Select(c => c.Index).ToList());
-                                    _currentColor.IsDone = true;
-                                    continue;
-                                }
-                            }
-                        } else {
-                            //todo...
-                        }
-                    }
-
-                    var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == myColor && cc.Count > 0 && !cc.IsDone)).ToList();
-                    var possible2Keys = possible2Spots.Select(kvp => kvp.Index).ToList();
-                    //note: possibleSpots2 includes the ones that are colored in..
-                    Color[] workingArray2 = _getArray(_currentItem.Index);
-                    possible2Keys.RemoveAll(i => !workingArray2[i].Equals(Color.Empty));
-                    var countStillNeeded = _currentColor.Count - workingArray2.Count(i => i.Equals(myColor));
-                    if (possible2Keys.Count == countStillNeeded) {
-                        FillCells(possible2Keys);
-                        _currentColor.IsDone = true;
-                        continue;
-                    }
-
-                    if (_currentColor.IsConnected) {
-                        Color[] workingArray = _getArray(_currentItem.Index);
-                        var firstIndex = IndexOf(workingArray, myColor);
-                        var lastIndex = LastIndexOf(workingArray, myColor);
-                        if (firstIndex <= OutOfBoundsConst) {
-                            //do nothing
-                        } else {
-                            var workingDict2 = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
-                            workingDict2 = FilterAwayNonTouchingSlots(workingDict2, firstIndex, myColor);
-                            if (firstIndex == workingDict2.First().Key) {
-                                FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
-                                _currentColor.IsDone = true;
-                                continue;
-                            } else if (lastIndex == workingDict2.Last().Key) {
-                                FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: workingDict2.Last().Key);
-                                _currentColor.IsDone = true;
-                                continue;
-                            } else {
-                                if (workingDict2.First().Key + _currentColor.Count > firstIndex) {
-                                    FillSelection(startIndex: firstIndex, endIndex: workingDict2.First().Key + _currentColor.Count);
-                                }
-                                if (workingDict2.Last().Key - _currentColor.Count + 1 < lastIndex) {
-                                    FillSelection(startIndex: workingDict2.Last().Key - _currentColor.Count + 1, endIndex: lastIndex);
-                                }
-                                FillSelection(startIndex: firstIndex, endIndex: lastIndex);
-                                //continue?
-                            }
-                        }
                     }
                 }
             }
@@ -346,6 +243,111 @@ namespace Domain.Picross {
                 var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
                     FillCells(new List<int> { 0, _selectionCount - 1 });
+                }
+            }
+        }
+        private void Solve_Part_Temp1() {
+            var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0)).ToList();
+            if (possibleSpots.Count == _currentColor.Count) {
+                FillCells(possibleSpots.Select(c => c.Index).ToList());
+                _currentColor.IsDone = true;
+                return;
+            } else {
+                //fleire mulige enn antall som skal til.
+                if (_currentColor.IsConnected) {
+                    Color[] workingArray = _getArray(_currentItem.Index);
+                    var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+                    var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+                    if (firstIndex <= OutOfBoundsConst || lastIndex <= OutOfBoundsConst) {
+                        //do nothing
+                    } else if (firstIndex - 1 <= OutOfBoundsConst) {
+                        //
+                    } else if (lastIndex + 1 > _selectionCount - 1) {
+                        //out of bounds
+                    } else {
+                        var cellBefore = _getCell(_currentItem.Index, firstIndex - 1);
+                        var cellAfter = _getCell(_currentItem.Index, lastIndex + 1); //må cache dette resultatet, da den neste FillSelection kan endre den!
+                        if (cellBefore.Equals(Color.Empty)) {
+                            //hmm...
+                        } else if (cellBefore != _currentColor.MyColor) {
+                            FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                        } else {
+                            throw new Exception("Wat, this should never happen!");
+                        }
+                        if (cellAfter.Equals(Color.Empty)) {
+                            //hmm...
+                        } else if (cellAfter != _currentColor.MyColor) {
+                            FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: lastIndex);
+                        } else {
+                            throw new Exception("Wat??? breakpoint her...");
+                        }
+                    }
+                } else if (!_currentColor.IsConnected && _currentColor.Count == 2) {
+                    //todo: Meir generell??
+                    Color[] workingArray = _getArray(_currentItem.Index);
+                    var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+                    if (firstIndex <= OutOfBoundsConst) {
+                        var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                        var temp = workingDict.Where(kvp => kvp.Value.Equals(Color.Empty)).ToDictionary();
+                        var first = temp.First().Key;
+                        if (temp.Count() == 3 && temp.ContainsKey(first + 1) && temp.ContainsKey(first + 2)) {
+                            FillCells(new List<int> { first, first + 2 });
+                        }
+                    } else {
+                        var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
+                        newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0 && cc.IsDone != true)).ToList();
+                        if (newPossibleSpots.Count == _currentColor.Count - 1) {
+                            FillCells(newPossibleSpots.Select(c => c.Index).ToList());
+                            _currentColor.IsDone = true;
+                            return;
+                        }
+                    }
+                } else {
+                    //todo...
+                }
+            }
+        }
+        private void Solve_Part_Temp2() {
+            var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0 && !cc.IsDone)).ToList();
+            var possible2Keys = possible2Spots.Select(kvp => kvp.Index).ToList();
+            //note: possibleSpots2 includes the ones that are colored in..
+            Color[] workingArray2 = _getArray(_currentItem.Index);
+            possible2Keys.RemoveAll(i => !workingArray2[i].Equals(Color.Empty));
+            var countStillNeeded = _currentColor.Count - workingArray2.Count(i => i.Equals(_currentColor.MyColor));
+            if (possible2Keys.Count == countStillNeeded) {
+                FillCells(possible2Keys);
+                _currentColor.IsDone = true;
+                return;
+            }
+        }
+
+        private void Solve_Part_Temp3() {
+            if (_currentColor.IsConnected) {
+                Color[] workingArray = _getArray(_currentItem.Index);
+                var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+                var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
+                if (firstIndex <= OutOfBoundsConst) {
+                    //do nothing
+                } else {
+                    var workingDict2 = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+                    workingDict2 = FilterAwayNonTouchingSlots(workingDict2, firstIndex, _currentColor.MyColor);
+                    if (firstIndex == workingDict2.First().Key) {
+                        FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                        _currentColor.IsDone = true;
+                        return;
+                    } else if (lastIndex == workingDict2.Last().Key) {
+                        FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: workingDict2.Last().Key);
+                        _currentColor.IsDone = true;
+                        return;
+                    } else {
+                        if (workingDict2.First().Key + _currentColor.Count > firstIndex) {
+                            FillSelection(startIndex: firstIndex, endIndex: workingDict2.First().Key + _currentColor.Count);
+                        }
+                        if (workingDict2.Last().Key - _currentColor.Count + 1 < lastIndex) {
+                            FillSelection(startIndex: workingDict2.Last().Key - _currentColor.Count + 1, endIndex: lastIndex);
+                        }
+                        FillSelection(startIndex: firstIndex, endIndex: lastIndex);
+                    }
                 }
             }
         }
