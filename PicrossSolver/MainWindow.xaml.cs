@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Domain;
+using Domain.GuiWrappers;
 
 namespace PicrossSolver {
     public partial class MainWindow : Window {

@@ -4,7 +4,7 @@ using System.Reflection;
 using Domain.Picross;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DomainTests.SolverTests {
+namespace DomainTests.MetaTests {
     [TestClass]
     public class SolverMetaTests {
         /// <summary>

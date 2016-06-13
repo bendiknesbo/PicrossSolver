@@ -38,11 +38,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GuiWrappers\CellPresenter.cs" />
+    <Compile Include="GuiWrappers\ClassifierPresenter.cs" />
+    <Compile Include="ColorExtensions.cs" />
+    <Compile Include="Helpers\NotifyExtensionMethods.cs" />
     <Compile Include="Picross\Classifier.cs" />
     <Compile Include="Picross\ColorClassifier.cs" />
     <Compile Include="Helpers\DictionaryHelpers.cs" />
     <Compile Include="Helpers\GridHelpers.cs" />
-    <Compile Include="GridPresenter.cs" />
+    <Compile Include="GuiWrappers\GridPresenter.cs" />
     <Compile Include="Level\GridStringLevel.cs" />
     <Compile Include="Interfaces\ILevel.cs" />
     <Compile Include="Level\ImageLevel.cs" />
@@ -58,6 +62,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\Selection.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
+    <Compile Include="GuiWrappers\RowPresenter.cs" />
+    <Compile Include="GuiWrappers\RowPresenterBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

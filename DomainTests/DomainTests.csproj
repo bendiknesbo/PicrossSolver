@@ -55,11 +55,12 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GridTests\GridTests.cs" />
+    <Compile Include="MetaTests\GuiWrapperMetaTests.cs" />
     <Compile Include="SolverTests\LevelImageSolverTests.cs" />
     <Compile Include="SolverTests\ManualStringTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SolverTests\ImageSolverTests.cs" />
-    <Compile Include="SolverTests\SolverMetaTests.cs" />
+    <Compile Include="MetaTests\SolverMetaTests.cs" />
     <Compile Include="SolverTests\SolverTestsBase.cs" />
     <Compile Include="SolverTests\TestImageSolverTests.cs" />
   </ItemGroup>

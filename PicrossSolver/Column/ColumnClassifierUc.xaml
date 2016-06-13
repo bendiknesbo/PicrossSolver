@@ -3,10 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:domain="clr-namespace:Domain;assembly=Domain"
-             xmlns:picrossSolver="clr-namespace:PicrossSolver"
              xmlns:cell="clr-namespace:PicrossSolver.Cell"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:ClassifierPresenter}"
+             xmlns:guiWrappers="clr-namespace:Domain.GuiWrappers;assembly=Domain"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance guiWrappers:ClassifierPresenter}"
              d:DesignHeight="120" d:DesignWidth="30" >
     <ListBox ItemsSource="{Binding Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
         <ItemsControl.ItemsPanel>
@@ -15,7 +14,7 @@
             </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         <ListBox.ItemTemplate>
-            <DataTemplate DataType="{x:Type domain:CellPresenter}">
+            <DataTemplate DataType="{x:Type guiWrappers:CellPresenter}">
                 <cell:CellUc />
             </DataTemplate>
         </ListBox.ItemTemplate>

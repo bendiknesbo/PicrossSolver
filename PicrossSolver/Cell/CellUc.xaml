@@ -2,10 +2,10 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:domain="clr-namespace:Domain;assembly=Domain"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:cell="clr-namespace:PicrossSolver.Cell"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:CellPresenter}"
+             xmlns:guiWrappers="clr-namespace:Domain.GuiWrappers;assembly=Domain"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance guiWrappers:CellPresenter}"
              Height="30" Width="30" Visibility="{Binding CellVisibility}">
     <Viewbox>
         <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
