@@ -53,6 +53,7 @@
     <Compile Include="Cell\CellUc.xaml.cs">
       <DependentUpon>CellUc.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Cell\OutlinedTextBlock.cs" />
     <Compile Include="Column\ColumnClassifierUc.xaml.cs">
       <DependentUpon>ColumnClassifierUc.xaml</DependentUpon>
     </Compile>

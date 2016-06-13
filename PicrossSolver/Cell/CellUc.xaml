@@ -4,13 +4,14 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:domain="clr-namespace:Domain;assembly=Domain"
+             xmlns:cell="clr-namespace:PicrossSolver.Cell"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance domain:CellPresenter}"
              Height="30" Width="30" Visibility="{Binding CellVisibility}">
     <Viewbox>
         <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
             <Grid Width="30" Height="30">
                 <Ellipse Stroke="Black" Visibility="{Binding IsConnectedVisibility}"/>
-                <TextBlock Text="{Binding Count}" FontSize="20"  VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                <cell:OutlinedTextBlock Text="{Binding Count}" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" Stroke="Black" Fill="White"/>
             </Grid>
         </Border>
     </Viewbox>
