@@ -196,7 +196,7 @@ namespace Domain.Picross {
         private void Solve_Part_WasAlreadySolved() {
             if (_currentColor.IsDone)
                 return;
-            if (_currentColor.Count == 0 || _currentColor.Count == FindNumberOfElementsInSelection()) {
+            if (_currentColor.Count == FindNumberOfElementsInSelection()) {
                 _currentColor.IsDone = true;
                 _isDirty = true;
             }
@@ -232,7 +232,7 @@ namespace Domain.Picross {
                 _currentColor.IsDone = true;
             } else {
                 var previousOppositeItem = _oppositeItems.First(c => c.Index == firstIndex - 1);
-                var prevContainsMyColor = previousOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && cc.Count > 0 && !cc.IsDone);
+                var prevContainsMyColor = previousOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && !cc.IsDone);
                 if (prevContainsMyColor == null) {
                     FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count - 1);
                 }
@@ -252,7 +252,7 @@ namespace Domain.Picross {
                 _currentColor.IsDone = true;
             } else {
                 var nextOppositeItem = _oppositeItems.First(c => c.Index == lastIndex + 1);
-                var nextContainsMyColor = nextOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && cc.Count > 0 && !cc.IsDone);
+                var nextContainsMyColor = nextOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && !cc.IsDone);
                 if (nextContainsMyColor == null) {
                     FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: lastIndex);
                 }
@@ -317,7 +317,7 @@ namespace Domain.Picross {
             if (_currentColor.IsConnected)
                 return;
             //todo: kan eg få til denne men med ferdig utfylte plasser?
-            var count = _currentItem.Colors.Count(cc => cc.Count > 0);
+            var count = _currentItem.Colors.Count;
             if (count == 2) {
                 var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
@@ -329,7 +329,7 @@ namespace Domain.Picross {
         private void Solve_Part_OnlyTwoColorsLeftInItem_OtherColorIsConnected() {
             if (_currentColor.IsConnected)
                 return;
-            var count = _currentItem.Colors.Count(cc => cc.Count > 0 && !cc.IsDone);
+            var count = _currentItem.Colors.Count(cc => !cc.IsDone);
             if (count == 2) {
                 var other = _currentItem.Colors.First(cc => !cc.IsDone && !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
@@ -357,7 +357,7 @@ namespace Domain.Picross {
         }
 
         private void Solve_Part_Temp1() {
-            var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0)).ToList();
+            var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor)).ToList();
             if (possibleSpots.Count == _currentColor.Count) {
                 FillCells(possibleSpots.Select(c => c.Index).ToList());
                 _currentColor.IsDone = true;
@@ -405,7 +405,7 @@ namespace Domain.Picross {
                         }
                     } else {
                         var newPossibleSpots = possibleSpots.Where(kvp => !(kvp.Index >= firstIndex - 1 && kvp.Index <= firstIndex + 1)).ToList();
-                        newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0 && cc.IsDone != true)).ToList();
+                        newPossibleSpots = newPossibleSpots.Where(kvp => kvp.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.IsDone != true)).ToList();
                         if (newPossibleSpots.Count == _currentColor.Count - 1) {
                             FillCells(newPossibleSpots.Select(c => c.Index).ToList());
                             _currentColor.IsDone = true;
@@ -419,7 +419,7 @@ namespace Domain.Picross {
         }
 
         private void Solve_Part_Temp2() {
-            var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0 && !cc.IsDone)).ToList();
+            var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && !cc.IsDone)).ToList();
             var possible2Keys = possible2Spots.Select(kvp => kvp.Index).ToList();
             //note: possibleSpots2 includes the ones that are colored in..
             Color[] workingArray2 = _getArray(_currentItem.Index);

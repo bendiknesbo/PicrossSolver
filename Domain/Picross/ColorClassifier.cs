@@ -5,6 +5,11 @@ namespace Domain.Picross {
         public Color MyColor { get; set; }
         public int Count { get; set; }
         public bool IsConnected { get; set; }
-        public bool IsDone { get; set; }
+
+        private bool _isDone;
+        public bool IsDone {
+            get { return _isDone || Count == 0; }
+            set { _isDone = value; }
+        }
     }
 }
