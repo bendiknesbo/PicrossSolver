@@ -37,6 +37,7 @@ namespace Domain.Picross {
             _cellCount = _rowCount * _colCount;
             Columns = columns;
             Rows = rows;
+            Rows = rows;
             WorkingGrid = new Color[rowCount, colCount];
             _iterationCounter = 0;
             //All Actions in this list should start with "Solve_Part_"
@@ -48,6 +49,7 @@ namespace Domain.Picross {
                 Solve_Part_FillConnectedFromEnd,
                 Solve_Part_PartiallyFillConnectedFromStart,
                 Solve_Part_PartiallyFillConnectedFromEnd,
+                Solve_Part_NotConnectedbutOnlyBlockSetIsConnected,
                 Solve_Part_PartiallyFillConnectedWithMoreThanHalf,
                 Solve_Part_FillBetweenConnected,
                 Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected,
@@ -217,8 +219,8 @@ namespace Domain.Picross {
             return count;
         }
 
-        //Before refactor: Number of failing tests: 38
-        //Before refactor: Number of failing tests: 300
+        //Before refactor: Number of failing tests: 4
+        //Before refactor: Number of inconclusive tests: 300
         private void Iterate(Selection selection) {
             SetupSelectionAndFields(selection);
 
@@ -347,6 +349,16 @@ namespace Domain.Picross {
                     //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
                     FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: lastIndex);
                 }
+            }
+        }
+
+        private void Solve_Part_NotConnectedbutOnlyBlockSetIsConnected() {
+            if (_currentColor.IsConnected)
+                return;
+            var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0)).ToList();
+            var idxList = new IndexList(possibleSpots.Select(c => c.Index));
+            if (idxList.Count == _currentColor.Count + 1 && idxList.IsConnected) {
+                FillCells(new List<int> { idxList.Min(), idxList.Max() });
             }
         }
 

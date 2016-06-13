@@ -41,6 +41,7 @@
     <Compile Include="GuiWrappers\CellPresenter.cs" />
     <Compile Include="GuiWrappers\ClassifierPresenter.cs" />
     <Compile Include="Helpers\ColorExtensions.cs" />
+    <Compile Include="Helpers\IndexList.cs" />
     <Compile Include="Helpers\NotifyExtensionMethods.cs" />
     <Compile Include="Picross\Classifier.cs" />
     <Compile Include="Picross\ColorClassifier.cs" />

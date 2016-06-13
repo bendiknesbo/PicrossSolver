@@ -55,6 +55,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="GridTests\GridTests.cs" />
+    <Compile Include="HelperTests\IndexListTests.cs" />
     <Compile Include="MetaTests\ExcludeFromCodeCoverageMetaTests.cs" />
     <Compile Include="SolverTests\LevelImageSolverTests.cs" />
     <Compile Include="SolverTests\ManualStringTests.cs" />
