@@ -10,7 +10,8 @@
     <Viewbox>
         <Border Background="{Binding MyColor}" BorderBrush="Black" BorderThickness="1">
             <Grid Width="30" Height="30">
-                <Ellipse Stroke="Black" Visibility="{Binding IsConnectedVisibility}"/>
+                <Ellipse Stroke="Black" Visibility="{Binding IsConnectedVisibility}" StrokeThickness="3"/>
+                <Ellipse Stroke="White" Visibility="{Binding IsConnectedVisibility}"/>
                 <cell:OutlinedTextBlock Text="{Binding Count}" FontSize="20" VerticalAlignment="Center" HorizontalAlignment="Center" StrokeThickness="2" Stroke="Black" Fill="White"/>
             </Grid>
         </Border>
