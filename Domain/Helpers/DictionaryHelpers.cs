@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Domain.Interfaces;
 using Domain.Level;
 
 namespace Domain.Helpers {
+    [ExcludeFromCodeCoverage]
     public static class DictionaryHelpers {
         public static List<ILevel> WithPrefix(this List<ILevel> dict, string prefix) {
             var newList = new List<ILevel>();

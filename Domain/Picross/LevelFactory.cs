@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Domain.Configuration;
 using Domain.Helpers;
 using Domain.Interfaces;
 
@@ -29,7 +30,7 @@ namespace Domain.Picross {
 
         public static List<ILevel> Get_Specific() {
             var list = new List<ILevel>();
-            var fileInfo = new FileInfo(Properties.SpecificLevel);
+            var fileInfo = new FileInfo(SpecificLevelProperties.SpecificLevelPath);
             list.AddFileFromFolder(fileInfo);
             return list;
         }
