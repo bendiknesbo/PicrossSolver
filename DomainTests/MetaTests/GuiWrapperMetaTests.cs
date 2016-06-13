@@ -9,7 +9,7 @@ namespace DomainTests.MetaTests {
     [TestClass]
     public class GuiWrapperMetaTests {
         [TestMethod]
-        public void TestMethod1() {
+        public void AllGuiWrappersAreExcludedFromCodeCoverage() {
             var assembly = Assembly.GetAssembly(typeof(GridPresenter));
             var presenterNamespace = typeof(GridPresenter).Namespace;
             Type[] guiWrappers = GetTypesInNamespace(assembly, presenterNamespace);
