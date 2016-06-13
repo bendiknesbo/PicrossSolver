@@ -51,6 +51,7 @@ namespace Domain.Picross {
                 Solve_Part_PartiallyFillConnectedWithMoreThanHalf,
                 Solve_Part_FillBetweenConnected,
                 Solve_Part_OnlyTwoColorsInItem_OtherColorIsConnected,
+                Solve_Part_OnlyTwoColorsLeftInItem_OtherColorIsConnected,
                 Solve_Part_Temp1,
                 Solve_Part_Temp2,
                 Solve_Part_Temp3,
@@ -321,6 +322,36 @@ namespace Domain.Picross {
                 var other = _currentItem.Colors.First(cc => !cc.MyColor.Equals(_currentColor.MyColor));
                 if (other.IsConnected) {
                     FillCells(new List<int> { 0, _selectionCount - 1 });
+                }
+            }
+        }
+
+        private void Solve_Part_OnlyTwoColorsLeftInItem_OtherColorIsConnected() {
+            if (_currentColor.IsConnected)
+                return;
+            var count = _currentItem.Colors.Count(cc => cc.Count > 0 && !cc.IsDone);
+            if (count == 2) {
+                var other = _currentItem.Colors.First(cc => !cc.IsDone && !cc.MyColor.Equals(_currentColor.MyColor));
+                if (other.IsConnected) {
+                    var array = _getArray(_currentItem.Index);
+                    var firstMyOwn = IndexOf(array, _currentColor.MyColor);
+                    var firstBlank = IndexOf(array, Color.Empty);
+                    var firstToUse = Math.Min(firstMyOwn, firstBlank);
+                    if (firstToUse <= OutOfBoundsConst)
+                        firstToUse = Math.Max(firstMyOwn, firstBlank);
+                    if (firstToUse <= OutOfBoundsConst)
+                        return;
+                    var lastMyOwn = LastIndexOf(array, _currentColor.MyColor);
+                    var lastBlank = LastIndexOf(array, Color.Empty);
+                    var lastToUse = Math.Max(lastMyOwn, lastBlank);
+                    if (lastToUse <= OutOfBoundsConst)
+                        return;
+                    var possibleRange = new IntRange { StartIndex = firstToUse, EndIndex = lastToUse };
+                    for (int i = possibleRange.StartIndex; i <= possibleRange.EndIndex; i++) {
+                        if (!array[i].Equals(Color.Empty) && !array[i].Equals(_currentColor.MyColor) && !array[i].Equals(other.MyColor))
+                            return;
+                    }
+                    FillCells(new List<int> { possibleRange.StartIndex, possibleRange.EndIndex });
                 }
             }
         }
