@@ -99,19 +99,18 @@ namespace Domain.Picross {
             }
         }
 
-        /// <summary>
-        /// Might be slow and not actually solve anything... possibly remove in futue...
-        /// </summary>
         private void IterateCells() {
             for (int rowIdx = 0; rowIdx < _rowCount; rowIdx++) {
                 for (int colIdx = 0; colIdx < _colCount; colIdx++) {
+                    if (!WorkingGrid[rowIdx, colIdx].Equals(Color.Empty))
+                        continue;
                     var row = Rows.First(r => r.Index == rowIdx);
                     var col = Columns.First(c => c.Index == colIdx);
-                    var rowColors = row.Colors.Where(c => !c.IsDone);
-                    var colColors = col.Colors.Where(c => !c.IsDone);
+                    var rowColors = row.Colors.Where(c => !c.IsDone).Select(c => c.MyColor).ToList();
+                    var colColors = col.Colors.Where(c => !c.IsDone).Select(c => c.MyColor).ToList();
                     var possibleColorsForCell = rowColors.Intersect(colColors).ToList();
                     if (possibleColorsForCell.Count == 1) {
-                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single().MyColor);
+                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single());
                     }
                 }
             }
@@ -219,6 +218,7 @@ namespace Domain.Picross {
                 }
             }
         }
+
         private void Solve_Part_PartiallyFillConnectedFromEnd() {
             if (!_currentColor.IsConnected)
                 return;
@@ -230,9 +230,9 @@ namespace Domain.Picross {
                     //Eksempel: 0,0,0,2,0 + Count=3 -> 0,0,2,2,0
                     FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: lastIndex);
                 }
-
             }
         }
+
         private void Solve_Part_PartiallyFillConnectedWithMoreThanHalf() {
             if (!_currentColor.IsConnected)
                 return;
@@ -255,6 +255,7 @@ namespace Domain.Picross {
                 }
             }
         }
+
         private void Solve_Part_Temp1() {
             var possibleSpots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0)).ToList();
             if (possibleSpots.Count == _currentColor.Count) {
@@ -316,6 +317,7 @@ namespace Domain.Picross {
                 }
             }
         }
+
         private void Solve_Part_Temp2() {
             var possible2Spots = _oppositeItems.Where(o => o.Colors.Any(cc => cc.MyColor == _currentColor.MyColor && cc.Count > 0 && !cc.IsDone)).ToList();
             var possible2Keys = possible2Spots.Select(kvp => kvp.Index).ToList();
@@ -496,16 +498,16 @@ namespace Domain.Picross {
         }
 
         private void FillCellAndSetDirty(int row, int column, Color? colorToFill = null) {
-            var color = colorToFill ?? _currentColor.MyColor;
+            colorToFill = colorToFill ?? _currentColor.MyColor;
             if (WorkingGrid[row, column].Equals(Color.Empty)) {
-                WorkingGrid[row, column] = color;
+                WorkingGrid[row, column] = colorToFill.Value;
                 _paintedCount++;
                 _isDirty = true;
             }
 #if DEBUG
             _readableString = WorkingGrid.ToReadableString();
-            if (AnswerGrid != null && AnswerGrid[row, column] != color)
-                throw new Exception(string.Format("Oops, wrong color! Expected: <{0}>. Actual: <{1}>", AnswerGrid[row, column], color));
+            if (AnswerGrid != null && AnswerGrid[row, column] != colorToFill.Value)
+                throw new Exception(string.Format("Oops, wrong color! Expected: <{0}>. Actual: <{1}>", AnswerGrid[row, column], colorToFill.Value));
 #endif
         }
     }
