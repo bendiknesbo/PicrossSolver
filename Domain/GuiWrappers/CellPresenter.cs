@@ -31,7 +31,7 @@ namespace Domain.GuiWrappers {
         }
 
         public Visibility IsConnectedVisibility {
-            get { return IsConnected ? Visibility.Visible : Visibility.Collapsed; }
+            get { return IsConnected && Count != "1" ? Visibility.Visible : Visibility.Collapsed; }
         }
 
         private bool _isDone;
