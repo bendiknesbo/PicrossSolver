@@ -108,12 +108,65 @@ namespace Domain.Picross {
                     var col = Columns.First(c => c.Index == colIdx);
                     var rowColors = row.Colors.Where(c => !c.IsDone).ToList();
                     var colColors = col.Colors.Where(c => !c.IsDone).ToList();
-                    var possibleColorsForCell = rowColors.Intersect(colColors, new ColorClassifierIsSameColorComparer()).ToList();
-                    if (possibleColorsForCell.Count == 1) {
-                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single().MyColor);
+                    var possibleColorClassifiersForCell = rowColors.Intersect(colColors, new ColorClassifierIsSameColorComparer()).ToList();
+                    if (possibleColorClassifiersForCell.Count == 1) {
+                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorClassifiersForCell.Single().MyColor);
+                    } else if (possibleColorClassifiersForCell.Count > 1) {
+                        var actualPossibleColorsForCell = possibleColorClassifiersForCell.Select(cc => cc.MyColor).ToList();
+                        foreach (var possibleColor in possibleColorClassifiersForCell) {
+                            var rowCc = rowColors.First(cc => cc.MyColor.Equals(possibleColor.MyColor));
+                            if (!rowCc.IsConnected) {
+                                //todo what if rowCc.IsConnected?
+                                var count = CountNumberOfElementsBeforeAndAfterInRow(rowIdx, colIdx, rowCc.MyColor);
+                                if (count + 1 == rowCc.Count)
+                                    actualPossibleColorsForCell.Remove(rowCc.MyColor);
+                            }
+                            var colCc = colColors.First(cc => cc.MyColor.Equals(possibleColor.MyColor));
+                            if (!colCc.IsConnected) {
+                                //todo what if colCc.IsConnected?
+                                var count = CountNumberOfElementsBeforeAndAfterInColumn(rowIdx, colIdx, colCc.MyColor);
+                                if (count + 1 == colCc.Count)
+                                    actualPossibleColorsForCell.Remove(colCc.MyColor);
+                            }
+                        }
+                        if (actualPossibleColorsForCell.Count == 1) {
+                            FillCellAndSetDirty(rowIdx, colIdx, actualPossibleColorsForCell.Single());
+                        }
                     }
                 }
             }
+        }
+
+        private int CountNumberOfElementsBeforeAndAfterInRow(int rowIdx, int startingColIdx, Color colorToFind) {
+            var array = WorkingGrid.GetRow(rowIdx);
+            var count = 0;
+            var i = startingColIdx - 1;
+            while (i >= 0 && array[i].Equals(colorToFind)) {
+                count++;
+                i--;
+            }
+            i = startingColIdx + 1;
+            while (i < _colCount && array[i].Equals(colorToFind)) {
+                count++;
+                i++;
+            }
+            return count;
+        }
+
+        private int CountNumberOfElementsBeforeAndAfterInColumn(int startingRowIdx, int colIdx, Color colorToFind) {
+            var array = WorkingGrid.GetColumn(colIdx);
+            var count = 0;
+            var i = startingRowIdx - 1;
+            while (i >= 0 && array[i].Equals(colorToFind)) {
+                count++;
+                i--;
+            }
+            i = startingRowIdx + 1;
+            while (i < _rowCount && array[i].Equals(colorToFind)) {
+                count++;
+                i++;
+            }
+            return count;
         }
 
         //Before refactor: Number of failing tests: 38
@@ -387,7 +440,6 @@ namespace Domain.Picross {
                 } else if (_currentColor.Count > half) {
                     FillSelection(startIndex: intRange.EndIndex - _currentColor.Count + 1, endIndex: intRange.StartIndex + _currentColor.Count - 1);
                 }
-
             }
         }
 
