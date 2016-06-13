@@ -170,10 +170,18 @@ namespace Domain.Picross {
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
             var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex <= OutOfBoundsConst)
+                return;
             if (firstIndex == 0) {
                 //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
                 FillSelection(startIndex: firstIndex, endIndex: _currentColor.Count);
                 _currentColor.IsDone = true;
+            } else {
+                var previousOppositeItem = _oppositeItems.First(c => c.Index == firstIndex - 1);
+                var prevContainsMyColor = previousOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && cc.Count > 0 && !cc.IsDone);
+                if (prevContainsMyColor == null) {
+                    FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                }
             }
         }
 
