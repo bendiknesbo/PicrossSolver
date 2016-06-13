@@ -12,6 +12,7 @@ namespace DomainTests.SolverTests {
     public abstract class SolverTestsBase {
         protected enum Step {
             Setup,
+            ManualSetup,
             Solve,
             Assert,
         }
@@ -19,6 +20,7 @@ namespace DomainTests.SolverTests {
 
         protected PicrossGrid Grid;
         protected PicrossSolver Solver;
+        protected Action ManualSetup;
 
         protected abstract void GridInit(string initializer);
 
@@ -42,6 +44,9 @@ namespace DomainTests.SolverTests {
                 Step step = Step.Setup;
                 try {
                     Setup(initializer);
+                    step = Step.ManualSetup;
+                    if (ManualSetup != null)
+                        ManualSetup();
                     step = Step.Solve;
                     Solver.Solve();
                     if (doubleSolve)
@@ -80,7 +85,7 @@ namespace DomainTests.SolverTests {
         protected const string HorizontalSplitter = "******************************************";
 
 
-        private void AppendLog(StringBuilder sb, Exception ex, Step step, ILevel level) {
+        protected void AppendLog(StringBuilder sb, Exception ex, Step step, ILevel level) {
             sb.AppendLine();
             sb.AppendLine(String.Format("Failed during step: **{0}**", step));
             sb.AppendLine(String.Format("Failed during level: **{0}**", level.Identifier));

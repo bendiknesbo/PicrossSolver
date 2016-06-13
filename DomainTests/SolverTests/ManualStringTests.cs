@@ -1,5 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Text;
+using Domain.Helpers;
 using Domain.Interfaces;
 using Domain.Level;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,7 +91,19 @@ namespace DomainTests.SolverTests {
                 }
                 AssertMatrix();
             }
+        }
 
+
+        [TestMethod]
+        public void FillFromLastIndex() {
+            Levels = new List<ILevel>{
+                new GridStringLevel("ManualTest1: 1", "2,2,2,1,1")
+            };
+            ManualSetup = () => {
+                Solver.WorkingGrid[0, 4] = Color.FromArgb(1);
+                Solver.Rows.Single().Colors.Reverse(); //reverse order so solver starts with color "1" instead of first encountered: "2"
+            };
+            Run();
         }
     }
 }

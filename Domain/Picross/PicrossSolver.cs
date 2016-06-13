@@ -183,9 +183,9 @@ namespace Domain.Picross {
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
             var lastIndex = LastIndexOf(workingArray, _currentColor.MyColor);
-            if (lastIndex == _selectionCount) {
+            if (lastIndex == _selectionCount - 1) {
                 //Eksempel: 0,0,0,0,2 + Count=3 -> 0,0,2,2,2
-                FillSelection(startIndex: lastIndex - _currentColor.Count, endIndex: lastIndex);
+                FillSelection(startIndex: lastIndex - _currentColor.Count + 1, endIndex: lastIndex);
                 _currentColor.IsDone = true;
             }
         }
