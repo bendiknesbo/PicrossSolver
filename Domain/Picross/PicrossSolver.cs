@@ -117,16 +117,20 @@ namespace Domain.Picross {
                         foreach (var possibleColor in possibleColorClassifiersForCell) {
                             var rowCc = rowColors.First(cc => cc.MyColor.Equals(possibleColor.MyColor));
                             if (!rowCc.IsConnected) {
-                                //todo what if rowCc.IsConnected?
                                 var count = CountNumberOfElementsBeforeAndAfterInRow(rowIdx, colIdx, rowCc.MyColor);
                                 if (count + 1 == rowCc.Count)
+                                    actualPossibleColorsForCell.Remove(rowCc.MyColor);
+                            } else {
+                                if (!CanConnectedColorReachCellInRow(rowIdx, colIdx, rowCc))
                                     actualPossibleColorsForCell.Remove(rowCc.MyColor);
                             }
                             var colCc = colColors.First(cc => cc.MyColor.Equals(possibleColor.MyColor));
                             if (!colCc.IsConnected) {
-                                //todo what if colCc.IsConnected?
                                 var count = CountNumberOfElementsBeforeAndAfterInColumn(rowIdx, colIdx, colCc.MyColor);
                                 if (count + 1 == colCc.Count)
+                                    actualPossibleColorsForCell.Remove(colCc.MyColor);
+                            } else {
+                                if (!CanConnectedColorReachCellInColumn(rowIdx, colIdx, colCc))
                                     actualPossibleColorsForCell.Remove(colCc.MyColor);
                             }
                         }
@@ -136,6 +140,49 @@ namespace Domain.Picross {
                     }
                 }
             }
+        }
+
+        private bool CanConnectedColorReachCellInRow(int rowIdx, int colIdx, ColorClassifier rowCc) {
+            var array = WorkingGrid.GetRow(rowIdx);
+            var firstIndex = IndexOf(array, rowCc.MyColor);
+            var lastIndex = LastIndexOf(array, rowCc.MyColor);
+            if (firstIndex <= OutOfBoundsConst)
+                return true;
+            if (firstIndex > colIdx) {
+                //a,_,_,_,b,_,_,_,_,a: "b" er connected, og Count = 2.
+                //colIdx = 1
+                //firstIndex = 4
+                //lastIndex = 4
+                var minIdx = lastIndex - rowCc.Count + 1; //3
+                if (colIdx < minIdx)
+                    return false;
+            } else if (lastIndex < colIdx) {
+                //a,a,a,_,b,_,_,_,_,a: "b" er connected, og Count = 2.
+                //colIdx = 6
+                //firstIndex = 4
+                //lastIndex = 4
+                var maxIdx = firstIndex + rowCc.Count - 1; //5
+                if (colIdx > maxIdx)
+                    return false;
+            }
+            return true;
+        }
+        private bool CanConnectedColorReachCellInColumn(int rowIdx, int colIdx, ColorClassifier colCc) {
+            var array = WorkingGrid.GetColumn(colIdx);
+            var firstIndex = IndexOf(array, colCc.MyColor);
+            var lastIndex = LastIndexOf(array, colCc.MyColor);
+            if (firstIndex <= OutOfBoundsConst)
+                return true;
+            if (firstIndex > rowIdx) {
+                var minIdx = lastIndex - colCc.Count + 1; //3
+                if (rowIdx < minIdx)
+                    return false;
+            } else if (lastIndex < rowIdx) {
+                var maxIdx = firstIndex + colCc.Count - 1; //5
+                if (rowIdx > maxIdx)
+                    return false;
+            }
+            return true;
         }
 
         private int CountNumberOfElementsBeforeAndAfterInRow(int rowIdx, int startingColIdx, Color colorToFind) {

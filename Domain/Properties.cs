@@ -1,6 +1,6 @@
 ﻿namespace Domain {
     public class Properties {
-        public static string SpecificLevel = @"LevelImages\EasyGallery1\Medium02.png";
+        public static string SpecificLevel = @"LevelImages\MediumGallery2\Large15.png";
 
     }
 }
