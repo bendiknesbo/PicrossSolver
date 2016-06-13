@@ -47,6 +47,7 @@
     <Compile Include="Interfaces\ILevel.cs" />
     <Compile Include="Level\ImageLevel.cs" />
     <Compile Include="Helpers\IntRange.cs" />
+    <Compile Include="Helpers\ColorClassifierIsSameColorComparer.cs" />
     <Compile Include="Picross\LevelFactory.cs" />
     <Compile Include="Helpers\LevelHelpers.cs" />
     <Compile Include="Helpers\Notifiable.cs" />

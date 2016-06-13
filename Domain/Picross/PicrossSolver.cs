@@ -106,11 +106,11 @@ namespace Domain.Picross {
                         continue;
                     var row = Rows.First(r => r.Index == rowIdx);
                     var col = Columns.First(c => c.Index == colIdx);
-                    var rowColors = row.Colors.Where(c => !c.IsDone).Select(c => c.MyColor).ToList();
-                    var colColors = col.Colors.Where(c => !c.IsDone).Select(c => c.MyColor).ToList();
-                    var possibleColorsForCell = rowColors.Intersect(colColors).ToList();
+                    var rowColors = row.Colors.Where(c => !c.IsDone).ToList();
+                    var colColors = col.Colors.Where(c => !c.IsDone).ToList();
+                    var possibleColorsForCell = rowColors.Intersect(colColors, new ColorClassifierIsSameColorComparer()).ToList();
                     if (possibleColorsForCell.Count == 1) {
-                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single());
+                        FillCellAndSetDirty(rowIdx, colIdx, possibleColorsForCell.Single().MyColor);
                     }
                 }
             }
