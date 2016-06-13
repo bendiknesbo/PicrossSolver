@@ -566,6 +566,7 @@ namespace Domain.Picross {
                 ActualFillCellsInRow(colNumbers: oppositeItemNumbers);
             else
                 ActualFillCellsInColumn(rowNumbers: oppositeItemNumbers);
+            Solve_Part_WasAlreadySolved();
         }
 
         private void ActualFillCellsInRow(List<int> colNumbers) {
