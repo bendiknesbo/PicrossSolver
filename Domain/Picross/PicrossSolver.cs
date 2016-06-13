@@ -150,7 +150,7 @@ namespace Domain.Picross {
 
         private void Solve_Part_WholeRowOrColumnIsSameColor() {
             if (_currentColor.Count == _selectionCount) {
-                FillSelection(0, _selectionCount);
+                FillSelection(0, _selectionCount - 1);
                 _currentColor.IsDone = true;
             }
         }
@@ -174,13 +174,13 @@ namespace Domain.Picross {
                 return;
             if (firstIndex == 0) {
                 //Eksempel: 2,0,0,0,0 + Count=3 -> 2,2,2,0,0
-                FillSelection(startIndex: firstIndex, endIndex: _currentColor.Count);
+                FillSelection(startIndex: firstIndex, endIndex: _currentColor.Count - 1);
                 _currentColor.IsDone = true;
             } else {
                 var previousOppositeItem = _oppositeItems.First(c => c.Index == firstIndex - 1);
                 var prevContainsMyColor = previousOppositeItem.Colors.FirstOrDefault(cc => cc.MyColor.Equals(_currentColor.MyColor) && cc.Count > 0 && !cc.IsDone);
                 if (prevContainsMyColor == null) {
-                    FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                    FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count - 1);
                 }
             }
         }
@@ -222,7 +222,7 @@ namespace Domain.Picross {
                         extraToTheLeft = workingDict.First(kvp => kvp.Key < firstIndex && kvp.Value.Equals(Color.Empty)).Key;
                     }
                     //Eksempel: 0,2,0,0,0 + Count=3 -> 0,2,2,0,0
-                    FillSelection(startIndex: firstIndex, endIndex: extraToTheLeft + _currentColor.Count);
+                    FillSelection(startIndex: firstIndex, endIndex: extraToTheLeft + _currentColor.Count - 1);
                 }
             }
         }
@@ -247,7 +247,7 @@ namespace Domain.Picross {
             //TODO: Allow padding from both sides.
             int half = _selectionCount / 2;
             if (_currentColor.Count > half) {
-                FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: _currentColor.Count);
+                FillSelection(startIndex: _selectionCount - _currentColor.Count, endIndex: _currentColor.Count - 1);
             }
         }
 
@@ -288,7 +288,7 @@ namespace Domain.Picross {
                         if (cellBefore.Equals(Color.Empty)) {
                             //hmm...
                         } else if (cellBefore != _currentColor.MyColor) {
-                            FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                            FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count - 1);
                         } else {
                             throw new Exception("Wat, this should never happen!");
                         }
@@ -351,7 +351,7 @@ namespace Domain.Picross {
                     var workingDict2 = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
                     workingDict2 = FilterAwayNonTouchingSlots(workingDict2, firstIndex, _currentColor.MyColor);
                     if (firstIndex == workingDict2.First().Key) {
-                        FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count);
+                        FillSelection(startIndex: firstIndex, endIndex: firstIndex + _currentColor.Count - 1);
                         _currentColor.IsDone = true;
                         return;
                     } else if (lastIndex == workingDict2.Last().Key) {
@@ -360,7 +360,7 @@ namespace Domain.Picross {
                         return;
                     } else {
                         if (workingDict2.First().Key + _currentColor.Count > firstIndex) {
-                            FillSelection(startIndex: firstIndex, endIndex: workingDict2.First().Key + _currentColor.Count);
+                            FillSelection(startIndex: firstIndex, endIndex: workingDict2.First().Key + _currentColor.Count - 1);
                         }
                         if (workingDict2.Last().Key - _currentColor.Count + 1 < lastIndex) {
                             FillSelection(startIndex: workingDict2.Last().Key - _currentColor.Count + 1, endIndex: lastIndex);
@@ -375,12 +375,19 @@ namespace Domain.Picross {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
+            if (workingArray.Any(c => c.Equals(_currentColor.MyColor)))
+                return; //should not check for one possible block set when there is already a painted cell in that array
             var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
             var intRangeList = FindBlockSetsWhereConnectedFits(workingDict);
             if (intRangeList.Count == 1) {
                 var intRange = intRangeList.Single();
-                if (intRange.EndIndex - intRange.StartIndex + 1 == _currentColor.Count)
+                var half = (intRange.EndIndex - intRange.StartIndex) / 2;
+                if (intRange.EndIndex - intRange.StartIndex + 1 == _currentColor.Count) {
                     FillSelection(startIndex: intRange.StartIndex, endIndex: intRange.EndIndex);
+                } else if (_currentColor.Count > half) {
+                    FillSelection(startIndex: intRange.EndIndex - _currentColor.Count + 1, endIndex: intRange.StartIndex + _currentColor.Count - 1);
+                }
+
             }
         }
 
@@ -493,14 +500,14 @@ namespace Domain.Picross {
 
         private void ActualFillRow(int startIndex, int endIndex) {
             var row = _currentItem.Index;
-            for (int i = startIndex; i < endIndex; i++) {
+            for (int i = startIndex; i <= endIndex; i++) {
                 FillCellAndSetDirty(row, i);
             }
         }
 
         private void ActualFillColumn(int startIndex, int endIndex) {
             var column = _currentItem.Index;
-            for (int i = startIndex; i < endIndex; i++) {
+            for (int i = startIndex; i <= endIndex; i++) {
                 FillCellAndSetDirty(i, column);
             }
         }
