@@ -58,6 +58,7 @@ namespace Domain.Picross {
                 Solve_Part_Temp2,
                 Solve_Part_Temp3,
                 Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits,
+                Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits2,
             };
         }
 
@@ -526,8 +527,6 @@ namespace Domain.Picross {
             if (!_currentColor.IsConnected)
                 return;
             Color[] workingArray = _getArray(_currentItem.Index);
-            if (workingArray.Any(c => c.Equals(_currentColor.MyColor)))
-                return; //should not check for one possible block set when there is already a painted cell in that array
             var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
             var intRangeList = FindBlockSetsWhereConnectedFits(workingDict);
             if (intRangeList.Count == 1) {
@@ -541,8 +540,78 @@ namespace Domain.Picross {
             }
         }
 
+        private void Solve_Part_OnlyOnePossibleBlockSetWhereConnectedFits2() {
+            if (!_currentColor.IsConnected)
+                return;
+            Color[] workingArray = _getArray(_currentItem.Index);
+            var firstIndex = IndexOf(workingArray, _currentColor.MyColor);
+            if (firstIndex <= OutOfBoundsConst)
+                return;
+            var workingDict = Enumerable.Range(0, workingArray.Length).ToDictionary(x => x, x => workingArray[x]);
+            var intRangeList = FindBlockSetsWhereConnectedFits_IgnoreDoneOnOtherItems(workingDict);
+
+            var intRange = intRangeList.Single(ir => ir.StartIndex <= firstIndex && ir.EndIndex >= firstIndex);
+            var half = (intRange.EndIndex - intRange.StartIndex) / 2;
+            if (intRange.EndIndex - intRange.StartIndex + 1 == _currentColor.Count) {
+                FillSelection(startIndex: intRange.StartIndex, endIndex: intRange.EndIndex);
+            } else if (_currentColor.Count > half) {
+                FillSelection(startIndex: intRange.EndIndex - _currentColor.Count + 1, endIndex: intRange.StartIndex + _currentColor.Count - 1);
+            }
+        }
+
         private List<IntRange> FindBlockSetsWhereConnectedFits(Dictionary<int, Color> dict) {
             return FindPossibleBlockSets(dict).Where(ir => ir.EndIndex - ir.StartIndex + 1 >= _currentColor.Count).ToList();
+        }
+        private List<IntRange> FindBlockSetsWhereConnectedFits_IgnoreDoneOnOtherItems(Dictionary<int, Color> dict) {
+            return FindPossibleBlockSets_IgnoreDoneOnOtherItems(dict).Where(ir => ir.EndIndex - ir.StartIndex + 1 >= _currentColor.Count).ToList();
+        }
+
+        private List<IntRange> FindPossibleBlockSets_IgnoreDoneOnOtherItems(Dictionary<int, Color> dict) {
+            var list = new List<IntRange>();
+            var tempRange = new IntRange();
+            for (int i = 0; i < _selectionCount; i++) {
+                var cell = dict[i];
+                if (tempRange.StartIndex == OutOfBoundsConst) {
+                    if (cell.Equals(_currentColor.MyColor)) {
+                        tempRange.StartIndex = i;
+                        continue;
+                    } else if (cell.Equals(Color.Empty)) {
+                        var opposite = _oppositeItems.First(c => c.Index == i);
+                        //todo: What if MyColor is in opposite, is not done, but can not reach?
+                        if (!opposite.Colors.Any(cc => cc.MyColor.Equals(_currentColor.MyColor))
+                            || opposite.Colors.First(cc => cc.MyColor.Equals(_currentColor.MyColor)).IsDone
+                            //|| (_selection == Selection.Row && !CanConnectedColorReachCellInRow(rowIdx,colIdxcolClass))
+                            //|| (_selection == Selection.Column && !CanConnectedColorReachCellInColumn(rowIdx,colIdx,colClass))
+                            )
+                            continue;
+                        tempRange.StartIndex = i;
+                        continue;
+                    }
+                } else {
+                    if (!cell.Equals(_currentColor.MyColor)) {
+                        if (!cell.Equals(Color.Empty)) {
+                            var opposite = _oppositeItems.First(c => c.Index == i);
+                            //todo: is this correct?
+                            //todo: What if MyColor is in opposite, is not done, but can not reach?
+                            if (!opposite.Colors.Any(cc => cc.MyColor.Equals(_currentColor.MyColor))
+                                || opposite.Colors.First(cc => cc.MyColor.Equals(_currentColor.MyColor)).IsDone
+                                //|| (_selection == Selection.Row && !CanConnectedColorReachCellInRow(rowIdx,colIdxcolClass))
+                                //|| (_selection == Selection.Column && !CanConnectedColorReachCellInColumn(rowIdx,colIdx,colClass))
+                                )
+                                continue;
+                            tempRange.EndIndex = i - 1;
+                            list.Add(tempRange);
+                            tempRange = new IntRange();
+                            continue;
+                        }
+                    }
+                }
+            }
+            if (tempRange.StartIndex != OutOfBoundsConst && tempRange.EndIndex == OutOfBoundsConst) {
+                tempRange.EndIndex = _selectionCount - 1;
+                list.Add(tempRange);
+            }
+            return list;
         }
 
         private List<IntRange> FindPossibleBlockSets(Dictionary<int, Color> dict) {
