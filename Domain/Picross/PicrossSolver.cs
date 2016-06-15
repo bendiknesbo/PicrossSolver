@@ -219,8 +219,8 @@ namespace Domain.Picross {
             return count;
         }
 
-        //Before refactor: Number of failing tests: 4
-        //Before refactor: Number of inconclusive tests: 300
+        //Before refactor: Number of failing tests: 6
+        //Before refactor: Number of inconclusive tests: 280
         private void Iterate(Selection selection) {
             SetupSelectionAndFields(selection);
 
