@@ -6,12 +6,15 @@ using System.Text;
 using Domain.Helpers;
 using Domain.Interfaces;
 using Domain.Level;
+using Domain.Picross;
+using DomainTests.TestBases;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests.SolverTests {
     [TestClass]
-    public class GridStringTests : SolverTestsBase {
+    public class GridStringSolverTests : PicrossSolverTestsBase {
         protected override void GridInit(string initializer) {
+            Grid = new PicrossGrid();
             Grid.InitFromGridString(initializer);
         }
 

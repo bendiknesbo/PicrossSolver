@@ -1,4 +1,5 @@
 using Domain.Picross;
+using DomainTests.TestBases;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests.SolverTests {

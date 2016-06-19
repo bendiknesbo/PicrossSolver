@@ -56,9 +56,11 @@
     <Compile Include="Picross\LevelFactory.cs" />
     <Compile Include="Helpers\LevelHelpers.cs" />
     <Compile Include="Helpers\Notifiable.cs" />
+    <Compile Include="Picross\PicrossBruteForcer.cs" />
     <Compile Include="Picross\PicrossGrid.cs" />
     <Compile Include="Picross\PicrossSolver.cs" />
     <Compile Include="Configuration\Properties.cs" />
+    <Compile Include="Picross\SolverBase.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Enums\Selection.cs" />

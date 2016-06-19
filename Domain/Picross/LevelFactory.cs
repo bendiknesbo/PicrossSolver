@@ -27,6 +27,11 @@ namespace Domain.Picross {
             FillListRecursive(Environment.CurrentDirectory + @"\TestImages", list);
             return list;
         }
+        public static List<ILevel> GetAll_Unsolvable() {
+            var list = new List<ILevel>();
+            FillListRecursive(Environment.CurrentDirectory + @"\UnsolvableTestImages", list);
+            return list;
+        }
 
         public static List<ILevel> Get_Specific() {
             var list = new List<ILevel>();

@@ -6,15 +6,7 @@ using Domain.Enums;
 using Domain.Helpers;
 
 namespace Domain.Picross {
-    public class PicrossSolver {
-        public List<Classifier> Rows { get; private set; }
-        public List<Classifier> Columns { get; private set; }
-
-        public Color[,] WorkingGrid;
-        public Color[,] AnswerGrid = null;
-        private readonly int _rowCount;
-        private readonly int _colCount;
-        private readonly int _cellCount;
+    public class PicrossSolver : SolverBase {
         private int _paintedCount;
         private bool _isDirty;
         private Func<int, Color[]> _getArray;
@@ -28,17 +20,10 @@ namespace Domain.Picross {
         private string _readableString;
         private int _iterationCounter;
         public const int OutOfBoundsConst = -1;
-
         public List<Action> SolvePartActions;
 
-        public PicrossSolver(int rowCount, int colCount, List<Classifier> rows, List<Classifier> columns) {
-            _colCount = colCount;
-            _rowCount = rowCount;
-            _cellCount = _rowCount * _colCount;
-            Columns = columns;
-            Rows = rows;
-            Rows = rows;
-            WorkingGrid = new Color[rowCount, colCount];
+        public PicrossSolver(int rowCount, int colCount, List<Classifier> rows, List<Classifier> columns)
+            : base(rowCount, colCount, rows, columns) {
             _iterationCounter = 0;
             //All Actions in this list should start with "Solve_Part_"
             SolvePartActions = new List<Action>{
@@ -62,13 +47,13 @@ namespace Domain.Picross {
             };
         }
 
-        public void Solve() {
+        public override void Solve() {
             _readableString = string.Empty;
             do {
                 SolveActually();
                 SolveActually();
                 SolveActually();
-                if (_cellCount == _paintedCount) break;
+                if (CellCount == _paintedCount) break;
             } while (_isDirty);
         }
 
@@ -82,7 +67,7 @@ namespace Domain.Picross {
                 Iterate(Selection.Row);
                 Iterate(Selection.Column);
                 IterateCells();
-                if (_cellCount == _paintedCount) break;
+                if (CellCount == _paintedCount) break;
             } while (_isDirty);
         }
 
@@ -91,21 +76,21 @@ namespace Domain.Picross {
             if (_selection == Selection.Row) {
                 _items = Rows;
                 _oppositeItems = Columns;
-                _selectionCount = _colCount;
+                _selectionCount = ColCount;
                 _getArray = (rowNumber => WorkingGrid.GetRow(rowNumber));
                 _getCell = ((x, y) => WorkingGrid[x, y]);
             } else {
                 _items = Columns;
                 _oppositeItems = Rows;
-                _selectionCount = _rowCount;
+                _selectionCount = RowCount;
                 _getArray = (colNumber => WorkingGrid.GetColumn(colNumber));
                 _getCell = ((x, y) => WorkingGrid[y, x]);
             }
         }
 
         private void IterateCells() {
-            for (int rowIdx = 0; rowIdx < _rowCount; rowIdx++) {
-                for (int colIdx = 0; colIdx < _colCount; colIdx++) {
+            for (int rowIdx = 0; rowIdx < RowCount; rowIdx++) {
+                for (int colIdx = 0; colIdx < ColCount; colIdx++) {
                     if (!WorkingGrid[rowIdx, colIdx].Equals(Color.Empty))
                         continue;
                     var row = Rows.First(r => r.Index == rowIdx);
@@ -197,7 +182,7 @@ namespace Domain.Picross {
                 i--;
             }
             i = startingColIdx + 1;
-            while (i < _colCount && array[i].Equals(colorToFind)) {
+            while (i < ColCount && array[i].Equals(colorToFind)) {
                 count++;
                 i++;
             }
@@ -213,7 +198,7 @@ namespace Domain.Picross {
                 i--;
             }
             i = startingRowIdx + 1;
-            while (i < _rowCount && array[i].Equals(colorToFind)) {
+            while (i < RowCount && array[i].Equals(colorToFind)) {
                 count++;
                 i++;
             }

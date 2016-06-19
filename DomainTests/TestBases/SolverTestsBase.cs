@@ -8,7 +8,7 @@ using Domain.Level;
 using Domain.Picross;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace DomainTests.SolverTests {
+namespace DomainTests.TestBases {
     public abstract class SolverTestsBase {
         protected enum Step {
             Setup,
@@ -19,17 +19,15 @@ namespace DomainTests.SolverTests {
         protected List<ILevel> Levels;
 
         protected PicrossGrid Grid;
-        protected PicrossSolver Solver;
+        protected SolverBase Solver;
         protected Action ManualSetup;
 
         protected abstract void GridInit(string initializer);
+        protected abstract void SolverInit();
 
         protected void Setup(string initializer) {
-            Grid = new PicrossGrid();
             GridInit(initializer);
-            Solver = new PicrossSolver(Grid.RowCount, Grid.ColumnCount, Grid.Rows, Grid.Columns) {
-                AnswerGrid = Grid.AnswerGrid
-            };
+            SolverInit();
         }
 
         protected void Run(bool doubleSolve = false) {
