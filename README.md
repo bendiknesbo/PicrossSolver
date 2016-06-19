@@ -2,8 +2,8 @@
 
 PicrossSolver is an attempt to automatically solve levels from the picross-game Hungry Cat Picross made by [Tuesday Quest][tuesdayQuest].
 
-[![Google Play](images/google_play.png)](http://market.android.com/details?id=com.tuesdayquest.logicart)
-[![App Store](images/app_store.png)](https://itunes.apple.com/us/app/hungry-cat-picross/id737744473)
+[![Google Play](Images/google_play.png?raw=true)](http://market.android.com/details?id=com.tuesdayquest.logicart)
+[![App Store](Images/app_store.png?raw=true)](https://itunes.apple.com/us/app/hungry-cat-picross/id737744473)
 
 The program is written purely in C# and WPF, and is currently separated into three parts: 
   - Domain: A class library where the magic happens. All the business logic is placed here.
