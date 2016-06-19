@@ -4,6 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Domain.Picross;
 
 namespace Domain.Helpers {
     public static class GridHelpers {
@@ -12,6 +13,7 @@ namespace Domain.Helpers {
         }
 
         private static Dictionary<Color, string> _cache;
+        public const int OutOfBoundsConst = -1;
 
         public static void ResetCache() {
             _cache = new Dictionary<Color, string> { { Color.Empty, "_" }, { Color.FromArgb(0), "_" } };
@@ -102,6 +104,64 @@ namespace Domain.Helpers {
                 res[i] = matrix[i, n];
             }
             return res;
+        }
+
+        public static bool IsSolved(this Color[,] matrix, List<Classifier> rows, List<Classifier> columns) {
+            foreach (var row in rows) {
+                var rowArr = matrix.GetRow(row.Index);
+                foreach (var color in row.Colors) {
+                    if (!rowArr.IsSolved(color))
+                        return false;
+                }
+            }
+            foreach (var column in columns) {
+                var colArr = matrix.GetColumn(column.Index);
+                foreach (var color in column.Colors) {
+                    if (!colArr.IsSolved(color))
+                        return false;
+                }
+            }
+            return true;
+        }
+
+        public static bool IsSolved(this Color[] arr, ColorClassifier color) {
+            if (color.IsConnected) {
+                var first = arr.IndexOf(color.MyColor);
+                if (first == OutOfBoundsConst || first + color.Count - 1 > arr.Length)
+                    return false;
+                for (int i = first; i <= first + color.Count - 1; i++) {
+                    if (arr[i] != color.MyColor) {
+                        return false;
+                    }
+                }
+                return true;
+            } else {
+                var count = arr.Count(c => c == color.MyColor);
+                if (count != color.Count) {
+                    return false;
+                }
+                var first = arr.IndexOf(color.MyColor);
+                var last = arr.LastIndexOf(color.MyColor);
+                if (last - first <= color.Count)
+                    return false;
+                return true;
+            }
+        }
+
+        public static int IndexOf(this Color[] arr, Color color) {
+            for (int i = 0; i < arr.Length; i++) {
+                if (arr[i] == color)
+                    return i;
+            }
+            return OutOfBoundsConst;
+        }
+
+        public static int LastIndexOf(this Color[] arr, Color color) {
+            for (int i = arr.Length - 1; i >= 0; i--) {
+                if (arr[i] == color)
+                    return i;
+            }
+            return OutOfBoundsConst;
         }
     }
 }

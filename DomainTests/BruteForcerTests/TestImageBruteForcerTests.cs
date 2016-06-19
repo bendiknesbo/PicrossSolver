@@ -15,5 +15,12 @@ namespace DomainTests.BruteForcerTests {
             Run();
         }
 
+        [TestMethod]
+        public void All_Levels() {
+            Assert.Inconclusive("This test takes forever to bruteforce, some major optimizations are needed!");
+            Levels = LevelFactory.GetAll_Levels();
+            Run();
+        }
+
     }
 }
