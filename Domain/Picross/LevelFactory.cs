@@ -13,14 +13,25 @@ namespace Domain.Picross {
             FillListRecursive(Environment.CurrentDirectory + @"\LevelImages", list);
             return list;
         }
-        public static void FillListRecursive(string dirPath, List<ILevel> list) {
-            DirectoryInfo dir = new DirectoryInfo(dirPath);
-            LevelHelpers.FromFolder(dir.FullName, list);
-            foreach (var childDir in dir.EnumerateDirectories()) {
-                FillListRecursive(childDir.FullName, list);
-            }
+        public static List<ILevel> GetAll_Seasons() {
+            var list = new List<ILevel>();
+            FillListRecursive(Environment.CurrentDirectory + @"\SeasonImages", list, excludeFilename: "combined.png");
+            return list;
+        }
+        public static List<ILevel> GetAll_Seasons_Combined() {
+            var list = new List<ILevel>();
+            FillListRecursive(Environment.CurrentDirectory + @"\SeasonImages", list, includeOnlyFilename: "combined.png");
+            return list;
         }
 
+
+        public static void FillListRecursive(string dirPath, List<ILevel> list, string excludeFilename = null, string includeOnlyFilename = null) {
+            DirectoryInfo dir = new DirectoryInfo(dirPath);
+            LevelHelpers.FromFolder(dir.FullName, list, excludeFilename, includeOnlyFilename);
+            foreach (var childDir in dir.EnumerateDirectories()) {
+                FillListRecursive(childDir.FullName, list, excludeFilename, includeOnlyFilename);
+            }
+        }
 
         public static List<ILevel> GetAll_Test() {
             var list = new List<ILevel>();

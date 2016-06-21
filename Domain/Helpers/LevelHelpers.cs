@@ -7,13 +7,17 @@ using Domain.Level;
 
 namespace Domain.Helpers {
     public static class LevelHelpers {
-        public static List<ILevel> FromFolder(string folderPath, List<ILevel> existingList = null) {
+        public static List<ILevel> FromFolder(string folderPath, List<ILevel> existingList = null, string excludeFilename = null, string includeOnlyFilename = null) {
             var newList = existingList ?? new List<ILevel>();
             var dirInfo = new DirectoryInfo(folderPath);
             if (!dirInfo.Exists) throw new DirectoryNotFoundException();
             folderPath = folderPath.Split(new[] { @"\" }, StringSplitOptions.RemoveEmptyEntries).Last();
             var folderPrefix = folderPath.SplitCamelCase();
             foreach (var fileInfo in dirInfo.EnumerateFiles()) {
+                if (excludeFilename != null && fileInfo.Name == excludeFilename)
+                    continue;
+                if (includeOnlyFilename != null && fileInfo.Name != includeOnlyFilename)
+                    continue;
                 newList.AddFileFromFolder(fileInfo, folderPrefix);
             }
             return newList;
