@@ -24,7 +24,7 @@ Want to contribute? Great!
 These are some of the stuff that still remains to do:
   - The domain library probably needs some refactoring
   - Some levels are still not solveable by the solver
-  - Some levels from the game are still not added as images to the project yet. Solutions for all levels exist at [picrossmadness.com][solutions]
+  - Some season-levels from the game have to many colors and needs to be normalized. Solutions for all levels exist at [picrossmadness.com][solutions]
   - Unit-tests needs to be written, not just integration-tests.
 
 I am new to using GitHub for open-source development, but if someone submitted a pull-request I would be able to figure out how to merge it into the project.

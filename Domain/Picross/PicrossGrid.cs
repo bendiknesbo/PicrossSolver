@@ -5,6 +5,10 @@ using System.Text;
 using Domain.Helpers;
 
 namespace Domain.Picross {
+    public enum GridInitializerEnum {
+        GridString,
+        ImageFilePath
+    }
     public class PicrossGrid {
         public int ColumnCount;
         public int RowCount;
@@ -14,17 +18,19 @@ namespace Domain.Picross {
         public List<Classifier> Rows = new List<Classifier>();
         public List<Classifier> Columns = new List<Classifier>();
 
-
-        public void InitFromGridString(string gridString) {
-            AnswerGrid = GridHelpers.InitFromGridString(gridString, rowCount: out RowCount, colCount: out ColumnCount);
+        public PicrossGrid(string initString, GridInitializerEnum initializer) {
+            switch (initializer) {
+                case GridInitializerEnum.GridString:
+                    AnswerGrid = GridHelpers.InitFromGridString(initString, rowCount: out RowCount, colCount: out ColumnCount);
+                    break;
+                case GridInitializerEnum.ImageFilePath:
+                    AnswerGrid = GridHelpers.InitFromImg(initString, rowCount: out RowCount, colCount: out ColumnCount);
+                    break;
+                default: throw new Exception("Unknown initializer");
+            }
             UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
-            GenerateRowClassifiers();
-            GenerateColumnClassifiers();
-        }
-
-        public void InitFromImg(string filePath) {
-            AnswerGrid = GridHelpers.InitFromImg(filePath, rowCount: out RowCount, colCount: out ColumnCount);
-            UsedColors = GridHelpers.GetUsedColorsFromGrid(AnswerGrid);
+            if(UsedColors.Count > 4)
+                throw new Exception(string.Format("To many colors detected! Detected a total of {0} colors", UsedColors.Count));
             GenerateRowClassifiers();
             GenerateColumnClassifiers();
         }

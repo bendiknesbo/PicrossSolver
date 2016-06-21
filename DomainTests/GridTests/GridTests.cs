@@ -9,7 +9,6 @@ namespace DomainTests.GridTests {
     public class GridTests {
         [TestMethod]
         public void Canary() {
-            var grid = new PicrossGrid();
             var temp = @"
 1,1,1,1,1
 1,1,1,1,1
@@ -17,7 +16,7 @@ namespace DomainTests.GridTests {
 2,2,2,1,1
 2,2,2,1,1
 ";
-            grid.InitFromGridString(temp);
+            var grid = new PicrossGrid(temp, GridInitializerEnum.GridString);
             Console.WriteLine(grid);
             Assert.AreEqual(5, grid.Rows.Count);
             Assert.AreEqual(5, grid.Columns.Count);
@@ -29,11 +28,10 @@ namespace DomainTests.GridTests {
 
         [TestMethod]
         public void Canary2() {
-            var grid = new PicrossGrid();
             var temp = @"
 1,2,1,1,1
 ";
-            grid.InitFromGridString(temp);
+            var grid = new PicrossGrid(temp, GridInitializerEnum.GridString);
             Console.WriteLine(grid);
             Assert.AreEqual(1, grid.Rows.Count);
             Assert.AreEqual(5, grid.Columns.Count);
@@ -45,37 +43,34 @@ namespace DomainTests.GridTests {
 
         [TestMethod]
         public void Test1() {
-            var grid = new PicrossGrid();
             var temp = @"
 1,1
 ";
-            grid.InitFromGridString(temp);
+            var grid = new PicrossGrid(temp, GridInitializerEnum.GridString);
             Assert.AreEqual(1, grid.Rows.Count);
             Assert.AreEqual(2, grid.Columns.Count);
         }
 
         [TestMethod]
         public void Test2() {
-            var grid = new PicrossGrid();
             var temp = @"
 1 
 2
 ";
-            grid.InitFromGridString(temp);
+            var grid = new PicrossGrid(temp, GridInitializerEnum.GridString);
             Assert.AreEqual(2, grid.Rows.Count);
             Assert.AreEqual(1, grid.Columns.Count);
         }
 
         [TestMethod]
         public void IsInitializable_Unsolvable1() {
-            var grid = new PicrossGrid();
             var temp = @"
 1,2,1,2
 2,1,2,1
 1,2,1,2 
 2,1,2,1
 ";
-            grid.InitFromGridString(temp);
+            var grid = new PicrossGrid(temp, GridInitializerEnum.GridString);
             Assert.AreEqual(4, grid.Rows.Count);
             Assert.AreEqual(4, grid.Columns.Count);
         }

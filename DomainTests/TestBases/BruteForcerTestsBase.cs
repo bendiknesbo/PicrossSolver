@@ -8,8 +8,7 @@ namespace DomainTests.TestBases {
         //protected PicrossSolver Solver; //todo: PicrossBruteForcer
 
         protected override void GridInit(string initializer) {
-            Grid = new PicrossGrid();
-            Grid.InitFromImg(initializer);
+            Grid = new PicrossGrid(initializer, GridInitializerEnum.ImageFilePath);
         }
 
         protected override void SolverInit() {

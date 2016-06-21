@@ -59,8 +59,7 @@ namespace Domain.GuiWrappers {
 
         private void LoadData(string path, bool doubleSolve = false) {
             GridHelpers.ResetCache();
-            _grid = new PicrossGrid();
-            _grid.InitFromImg(path);
+            _grid = new PicrossGrid(path, GridInitializerEnum.ImageFilePath);
             _solver = new PicrossSolver(_grid.RowCount, _grid.ColumnCount, _grid.Rows, _grid.Columns);
             _solver.Solve();
             if (doubleSolve)

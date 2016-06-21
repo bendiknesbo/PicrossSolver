@@ -55,6 +55,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="BruteForcerTests\TestImageBruteForcerTests.cs" />
+    <Compile Include="SolverTests\SeasonImageSolverTests.cs" />
     <Compile Include="TestBases\BruteForcerTestsBase.cs" />
     <Compile Include="GridTests\GridTests.cs" />
     <Compile Include="HelperTests\IndexListTests.cs" />

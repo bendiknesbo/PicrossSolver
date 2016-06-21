@@ -14,8 +14,7 @@ namespace DomainTests.SolverTests {
     [TestClass]
     public class GridStringSolverTests : PicrossSolverTestsBase {
         protected override void GridInit(string initializer) {
-            Grid = new PicrossGrid();
-            Grid.InitFromGridString(initializer);
+            Grid = new PicrossGrid(initializer, GridInitializerEnum.GridString);
         }
 
         [TestMethod]
