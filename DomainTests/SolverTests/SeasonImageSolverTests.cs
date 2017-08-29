@@ -3,7 +3,7 @@ using DomainTests.TestBases;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DomainTests.SolverTests {
-    [TestClass]
+    //[TestClass]
     public class SeasonImageSolverTests : ImageSolverTests {
         private const int ImagesPerYear = 52;
         private const int ImagesPerWeek = 9;
@@ -18,7 +18,7 @@ namespace DomainTests.SolverTests {
         [TestMethod]
         public void All_Seaons_Combined() {
             Levels = LevelFactory.GetAll_Seasons_Combined();
-            Assert.AreEqual(ImagesPerWeek * WholeYearsAdded, Levels.Count);
+            Assert.AreEqual(ImagesPerYear * WholeYearsAdded, Levels.Count);
             Run();
         }
     }

@@ -1,5 +1,5 @@
 ﻿namespace Domain.Configuration {
     public class SpecificLevelProperties {
-        public static string SpecificLevelPath = @"LevelImages\HardGallery2\Large06.png";
+        public static string SpecificLevelPath = @"LevelImages\Bonus1Gallery2\XLarge15.png";
     }
 }
